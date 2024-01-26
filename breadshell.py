@@ -84,7 +84,8 @@ def games():
         i += 1
     game = input(f'{c.cyan}breadgames{c.r} > ')
     if games[int(game)-1] in games:
-        print('success')
+        print(f'Loading {games[int(game)-1]}...')
+        exec(f'start_{games[int(game)-1]}()')
     else:
         throwerror('Not a valid game')
         games()
