@@ -52,6 +52,8 @@ class c:
     yellow = colorama.Fore.YELLOW
     green = colorama.Fore.GREEN
     blue = colorama.Fore.BLUE
+    magenta = colorama.Fore.MAGENTA
+    cyan = colorama.Fore.CYAN
     r = colorama.Fore.RESET # resets color to default
 
 # basic functions
