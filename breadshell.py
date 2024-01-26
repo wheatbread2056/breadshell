@@ -67,6 +67,28 @@ def fatalerror(msg='A fatal error has occured, exiting immediately'):
     print(f'{c.red}{msg}')
     exit()
 
+# games
+    
+# snake
+
+# game launcher
+def games():
+    globalversion = '0.2'
+    # list amount of games here
+    games = ['snake','tetris','minecraft','calculator']
+    print(f'bread games version {globalversion}')
+    print(f'please select the game you would like to start ({len(games)} found):')
+    i = 1
+    for game in games:
+        print(f'{c.yellow}{i} - {game}')
+        i += 1
+    game = input(f'{c.cyan}breadgames{c.r} > ')
+    if games[int(game)-1] in games:
+        print('success')
+    else:
+        throwerror('Not a valid game')
+        games()
+
 # start of program, shown when opening the file
 print(f'version {version}')
 print('type bhelp for a list of custom commands')
@@ -100,7 +122,7 @@ bfetch - get system information
 binst <package-name> - easy way to install packages
 buninst <package-name> - easy way to uninstall packages
 bpkgs <query> - search packages
-whatsnew - displays what's new in breadshell
+bgames - start game launcher
 exit - exits breadshell
 ''')
         
@@ -144,17 +166,9 @@ exit - exits breadshell
     elif cmd.startswith('dev-generic-fatalerror'):
         fatalerror()
 
-    # what's new?
-    elif cmd.startswith('whatsnew'):
-        print(f'''
-what's new in breadshell version {version}
-- BETTER ERROR HANDLING
-almost everything now uses try and except, this bloats the code but it's worth it
-- user@hostname
-now you can see your username and hostname easily
-- automatic module installing
-if a module (e.g. colorama) isn't installed, then breadshell will automatically install it to ensure that everything works properly
-            ''')
+    # launch games
+    elif cmd.startswith('bgames'):
+        games()
         
     # if none of the above commands were selected, it will run this (run any command inside the input)
         
