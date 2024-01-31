@@ -55,7 +55,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number...
-version = '0.4'
+version = '0.5-dev1'
 
 # define colors
 class c:
@@ -263,9 +263,9 @@ def main():
 
     {c.yellow}bhelp{c.r} - open this page
     {c.yellow}bfetch{c.r} - get system information
-    {c.yellow}binst{c.r} <package-name> - easy way to install packages
-    {c.yellow}buninst{c.r} <package-name> - easy way to uninstall packages
-    {c.yellow}bpkgs{c.r} <query> - search packages
+    {c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
+    {c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
+    {c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
     {c.yellow}bgames{c.r} - start game launcher
     {c.yellow}butils{c.r} - start utility launcher
     {c.yellow}version{c.r} - displays version information
@@ -277,15 +277,15 @@ def main():
             print('making this later, for now just have neofetch')
             subprocess.run(['bash','-c','neofetch'])
 
-        # breadinstall (binst)
-        elif cmd.startswith('binst'):
+        # breadinstall (inst)
+        elif cmd.startswith('inst'):
             try:
                 subprocess.run(['bash','-c',f'sudo apt install {cmd.split(" ")[1]}'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
-        # breaduninstall (buninst)
-        elif cmd.startswith('buninst'):
+        # breaduninstall (uninst)
+        elif cmd.startswith('uninst'):
             try:
                 subprocess.run(['bash','-c',f'sudo apt remove {cmd.split(" ")[1]}'])
             except:
