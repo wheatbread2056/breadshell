@@ -1,10 +1,11 @@
 shell for linux
 
-to install: (broken currently)
-`bash path/to/breadshell/install.sh`
+to install:
+`cd path/to/breadshell` (replacing path/to with the actual path to the folder, usually `Downloads/breadshell`)
+then `bash install.sh`
 
 roadmap:
-- fix install.sh (0.4)
+- fix install.sh (0.4) done
 - logging for debugging and troubleshooting (0.5)
 - settings (0.5)
 - add bfetch (0.6)
