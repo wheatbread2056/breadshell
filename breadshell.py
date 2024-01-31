@@ -91,8 +91,8 @@ def start_calculator():
             exec(f'print({cmd})')
 
 def start_python():
-    cmd = input(f'{c.cyan}python{c.r} > ')
     while True:
+        cmd = input(f'{c.cyan}python{c.r} > ')
         if cmd == 'exit':
             utillauncher()
         else:
