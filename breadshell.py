@@ -9,6 +9,13 @@ except:
     os.system('sudo apt install python3-time -y')
     import time
 
+# import datetime
+try:
+    import datetime
+except:
+    print('datetime not installed, installing now')
+    os.system('sudo apt install python3-datetime -y')
+    import datetime
 # import colorama
 try:
     import colorama
@@ -37,7 +44,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number...
-version = '0.3'
+version = '0.4-dev2'
 
 # define colors
 class c:
@@ -48,6 +55,15 @@ class c:
     magenta = colorama.Fore.MAGENTA
     cyan = colorama.Fore.CYAN
     r = colorama.Fore.RESET # resets color to default
+# background colors
+class bc:
+    red = colorama.Back.RED
+    yellow = colorama.Back.YELLOW
+    green = colorama.Back.GREEN
+    blue = colorama.Back.BLUE
+    magenta = colorama.Back.MAGENTA
+    cyan = colorama.Back.CYAN
+    r = colorama.Back.RESET # resets color to default
 
 # basic functions
     
@@ -122,9 +138,8 @@ def utillauncher():
         exec(f'start_{utilities[int(utility)-1]}()')
 
 # start of program, shown when opening the file
-print(f'version {version}')
-print('type bhelp for a list of custom commands')
-
+print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
+print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
 def main():
     while True:
