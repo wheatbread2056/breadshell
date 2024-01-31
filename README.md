@@ -4,13 +4,37 @@ to install:
 `cd path/to/breadshell` (replacing path/to with the actual path to the folder, usually `Downloads/breadshell`)
 then `bash install.sh`
 
-roadmap:
-- fix install.sh (0.4) done
-- logging for debugging and troubleshooting (0.5)
-- settings (0.5)
-- add bfetch (0.6)
-- add themes (0.6)
-- support for importing/exporting themes (0.6)
-- add custom games (1.0)
-- autocomplete (1.1)
-- plugins (1.2)
+known bugs:
+- doesn't work on konsole (kde) for some reason
+- ctrl+c crashes breadshell
+- invalid options break butils/bgames
+
+update log + roadmap:
+
+**ancient updates**
+
+- 0.1: basic functionality
+- 0.2: now you get to see the current path and change directories
+- 0.3: now you get to see the user and hostname, have custom commands, and use basic utilities
+
+**0.4 (released)**
+
+- fix install.sh (done)
+
+**0.5**
+
+- logging for debugging and troubleshooting
+- settings
+- option to use breadshell as the default shell
+
+**1.0**
+
+- add bfetch
+- add light mode
+- fix incompatibility with konsole
+
+**1.1**
+
+- add custom games
+- add autocomplete similar to fish
+- add an actual calculator instead of a slightly modified version of the python utility
