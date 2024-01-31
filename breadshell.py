@@ -69,6 +69,8 @@ def start_calculator():
         cmd = input(f'{c.cyan}calculator{c.r} > ')
         if cmd == 'exit':
             utillauncher()
+        elif cmd == '9+10':
+            print(21)
         else:
             exec(f'print({cmd})')
 
