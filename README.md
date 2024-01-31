@@ -5,7 +5,7 @@ to install:
 then `bash install.sh`
 
 roadmap:
-- fix install.sh (0.4)
+- fix install.sh (0.4) done
 - logging for debugging and troubleshooting (0.5)
 - settings (0.5)
 - add bfetch (0.6)
