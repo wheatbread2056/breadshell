@@ -55,7 +55,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number...
-version = '0.4-pre1'
+version = '0.4'
 
 # define colors
 class c:
@@ -257,19 +257,19 @@ def main():
         # breadhelp (bhelp)
         elif cmd.startswith('bhelp'):
             print(f'''
-    breadshell version {version}
+    breadshell version {c.cyan}{version}{c.r}
 
     --- CUSTOM COMMANDS ---
 
-    bhelp - open this page
-    bfetch - get system information
-    binst <package-name> - easy way to install packages
-    buninst <package-name> - easy way to uninstall packages
-    bpkgs <query> - search packages
-    bgames - start game launcher
-    butils - start utility launcher
-    version - displays version information
-    exit - exits breadshell
+    {c.yellow}bhelp{c.r} - open this page
+    {c.yellow}bfetch{c.r} - get system information
+    {c.yellow}binst{c.r} <package-name> - easy way to install packages
+    {c.yellow}buninst{c.r} <package-name> - easy way to uninstall packages
+    {c.yellow}bpkgs{c.r} <query> - search packages
+    {c.yellow}bgames{c.r} - start game launcher
+    {c.yellow}butils{c.r} - start utility launcher
+    {c.yellow}version{c.r} - displays version information
+    {c.red}exit{c.r} - exits breadshell
     ''')
             
         # breadfetch (bfetch)
