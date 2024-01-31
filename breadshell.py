@@ -88,7 +88,10 @@ def start_calculator():
         elif cmd == '9+10':
             print(21)
         else:
-            exec(f'print({cmd})')
+            try:
+                exec(f'print({cmd})')
+            except:
+                throwerror()
 
 def start_python():
     while True:
@@ -96,7 +99,10 @@ def start_python():
         if cmd == 'exit':
             utillauncher()
         else:
-            exec(cmd)
+            try:
+                exec(cmd)
+            except:
+                throwerror()
 
 
 # game launcher
