@@ -1,1 +1,1 @@
-python3 usr/src/breadshell/breadshell.py
+python3 /usr/src/breadshell/breadshell.py
