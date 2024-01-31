@@ -68,6 +68,7 @@ class c:
     white = colorama.Fore.WHITE
     black = colorama.Fore.BLACK
     r = colorama.Fore.RESET # resets color to default
+
 # background colors
 class bc:
     red = colorama.Back.RED
@@ -103,6 +104,8 @@ def startu_colortester():
         a = random.randint(0,len(chars)-1)
         char = chars[a]
         b = random.randint(1,9)
+
+        # wow this code is inefficient
 
         # skipping d since c is used for foreground colors
         if b == 1:
@@ -265,6 +268,7 @@ def main():
     bpkgs <query> - search packages
     bgames - start game launcher
     butils - start utility launcher
+    version - displays version information
     exit - exits breadshell
     ''')
             
@@ -315,6 +319,11 @@ def main():
         # launch utilities
         elif cmd.startswith('butils'):
             utillauncher()
+
+        # display version info
+        elif cmd.startswith('version'):
+            print(f'breadshell version {c.cyan}{version}{c.r}')
+            print(f'made by {c.blue}wheatbread2056{c.r} on github')
             
         # if none of the above commands were selected, it will run this (run any command inside the input)
             
@@ -323,4 +332,6 @@ def main():
                 subprocess.run(['bash','-c',cmd])
             except:
                 fatalerror()
+            
+# run main function (moved from while loop to function in 0.3 so the user can be returned back to the shell in case anything goes wrong)
 main()
