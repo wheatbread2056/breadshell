@@ -55,7 +55,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number...
-version = '0.4-dev2'
+version = '0.4-pre1'
 
 # define colors
 class c:
