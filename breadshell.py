@@ -55,7 +55,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-dev3'
+version = '0.5-dev4'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build
 
 # define colors
@@ -81,6 +81,29 @@ class bc:
     white = colorama.Back.WHITE
     black = colorama.Back.BLACK
     r = colorama.Back.RESET # resets color to default
+
+# check if breadshell is installed
+try:
+    currentdir = os.getcwd()
+    scriptdir = os.path.dirname(__file__)
+
+    # if this doesn't work, it will give an error, which is how this works
+    os.chdir('/usr/src/breadshell')
+    if scriptdir == '/usr/src/breadshell':
+        installed = True
+        runfrominstall = True
+    else:
+        print(f'{c.red}breadshell is installed, but you are running it from a file instead{c.r}')
+        installed = True
+        runfrominstall = False
+
+    # change back to the previous directory
+    os.chdir(currentdir)
+
+except:
+    print(f'{c.red}breadshell is not installed, install it for more functionality{c.r}')
+    installed = False
+    runfrominstall = False
 
 # basic functions
     
@@ -235,24 +258,6 @@ def utillauncher():
         exec(f'startu_{utilities[int(utility)-1]}()')
 
 # start of program, shown when opening the file
-        
-# check if breadshell is installed
-try:
-    currentdir = os.getcwd()
-    scriptdir = os.path.dirname(__file__)
-
-    # if this doesn't work, it will give an error, which is how this works
-    os.chdir('/usr/src/breadshell')
-    if scriptdir == '/usr/src/breadshell':
-        pass
-    else:
-        print(f'{c.red}breadshell is installed, but you are running it from a file instead{c.r}')
-
-    # change back to the previous directory
-    os.chdir(currentdir)
-except:
-    print(f'{c.red}breadshell is not installed, install it for more functionality{c.r}')
-
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
@@ -352,6 +357,18 @@ def main():
                 print(f'this is a {c.magenta}development{c.r} build of breadshell')
             else:
                 print(f'this is an {c.red}unknown{c.r} build of breadshell')
+
+            # display installation status
+            if installed == True:
+                print(f'breadshell is {c.green}installed{c.r}')
+            else:
+                print(f'breadshell is {c.red}not installed{c.r}')
+
+            # running from file or not
+            if runfrominstall == True:
+                print(f'running from {c.green}install{c.r}')
+            else:
+                print(f'running from {c.red}file{c.r}')
 
             print(f'made by {c.blue}wheatbread2056{c.r} on github')
             
