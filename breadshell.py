@@ -62,6 +62,9 @@ os.environ['SHELL'] = '/bin/bash'
 version = '0.5-dev4'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build
 
+# clear the console
+os.system('clear')
+
 # define colors
 class c:
     red = colorama.Fore.RED
