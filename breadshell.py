@@ -55,7 +55,8 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-dev2'
+version = '0.5-dev3'
+versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build
 
 # define colors
 class c:
@@ -234,17 +235,24 @@ def utillauncher():
         exec(f'startu_{utilities[int(utility)-1]}()')
 
 # start of program, shown when opening the file
+        
+# check if breadshell is installed
 try:
     currentdir = os.getcwd()
     scriptdir = os.path.dirname(__file__)
+
+    # if this doesn't work, it will give an error, which is how this works
     os.chdir('/usr/src/breadshell')
     if scriptdir == '/usr/src/breadshell':
         pass
     else:
-        print(f'{c.red}breadshell is installed, but you are running it from a file instead')
+        print(f'{c.red}breadshell is installed, but you are running it from a file instead{c.r}')
+
+    # change back to the previous directory
     os.chdir(currentdir)
 except:
-    print(f'{c.red}breadshell is not installed, install it for more functionality')
+    print(f'{c.red}breadshell is not installed, install it for more functionality{c.r}')
+
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
@@ -334,6 +342,17 @@ def main():
         # display version info
         elif cmd.startswith('version'):
             print(f'breadshell version {c.cyan}{version}{c.r}')
+
+            # display version type
+            if versiontype == 1:
+                print(f'this is a {c.green}release{c.r} build of breadshell')
+            elif versiontype == 2:
+                print(f'this is a {c.yellow}prerelease{c.r} build of breadshell')
+            elif versiontype == 3:
+                print(f'this is a {c.magenta}development{c.r} build of breadshell')
+            else:
+                print(f'this is an {c.red}unknown{c.r} build of breadshell')
+
             print(f'made by {c.blue}wheatbread2056{c.r} on github')
             
         # if none of the above commands were selected, it will run this (run any command inside the input)
