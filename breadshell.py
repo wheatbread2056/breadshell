@@ -1,7 +1,11 @@
-# os library is NEEDED for this to run
-import os
-
 # IMPORT ALL DEPENDENCIES
+
+# import os (needed to import others)
+try:
+    import os
+except:
+    print('os not installed, you must install it before using breadshell')
+    exit()
 
 # import time
 try:

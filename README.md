@@ -23,11 +23,11 @@ update log + roadmap:
 
 - fix install.sh (done)
 
-**0.5**
+**0.5 (in progress)**
 
 - logging for debugging and troubleshooting
 - settings
-- option to use breadshell as the default shell
+- option to use breadshell as the default shell (done)
 
 **1.0**
 
