@@ -54,8 +54,8 @@ except:
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
-# version number...
-version = '0.5-dev1'
+# version number and other information
+version = '0.5-dev2'
 
 # define colors
 class c:
@@ -234,6 +234,17 @@ def utillauncher():
         exec(f'startu_{utilities[int(utility)-1]}()')
 
 # start of program, shown when opening the file
+try:
+    currentdir = os.getcwd()
+    scriptdir = os.path.dirname(__file__)
+    os.chdir('/usr/src/breadshell')
+    if scriptdir == '/usr/src/breadshell':
+        pass
+    else:
+        print(f'{c.red}breadshell is installed, but you are running it from a file instead')
+    os.chdir(currentdir)
+except:
+    print(f'{c.red}breadshell is not installed, install it for more functionality')
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
@@ -280,14 +291,14 @@ def main():
         # breadinstall (inst)
         elif cmd.startswith('inst'):
             try:
-                subprocess.run(['bash','-c',f'sudo apt install {cmd.split(" ")[1]}'])
+                subprocess.run(['bash','-c',f'sudo apt install {cmd.split(" ")[1]} -y'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
         # breaduninstall (uninst)
         elif cmd.startswith('uninst'):
             try:
-                subprocess.run(['bash','-c',f'sudo apt remove {cmd.split(" ")[1]}'])
+                subprocess.run(['bash','-c',f'sudo apt remove {cmd.split(" ")[1]} -y'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
