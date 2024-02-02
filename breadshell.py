@@ -338,6 +338,7 @@ def main():
     {c.yellow}bgames{c.r} - start game launcher
     {c.yellow}butils{c.r} - start utility launcher
     {c.yellow}version{c.r} - displays version information
+    {c.yellow}settings{c.r} - change your breadshell settings
     {c.red}exit{c.r} - exits breadshell
     ''')
             
@@ -416,7 +417,31 @@ def main():
                 print(f'running from {c.red}file{c.r}')
 
             print(f'made by {c.blue}wheatbread2056{c.r} on github')
-            
+
+        # edit settings
+        elif cmd.startswith('settings'):
+            print('which setting would you like to change?')
+
+            for key, value in settings.items():
+                print(f"{key} - {c.cyan}{value}")
+
+            while True:
+                setting = input(f'{c.cyan}settings{c.r} > ')
+                if setting in settings:
+                    print('Enter a new value:')
+                    newValue = input(f'{c.cyan}{setting}{c.r} > ')
+                    if newValue.lower() == 'true':
+                        add_settings(setting,True)
+                    elif newValue.lower() == 'false':
+                        add_settings(setting,False)
+                    else:
+                        add_settings(setting,newValue)
+                elif setting == 'exit':
+                    break
+                else:
+                    throwerror('Invalid setting')
+
+
         # if none of the above commands were selected, it will run this (run any command inside the input)
             
         else:
