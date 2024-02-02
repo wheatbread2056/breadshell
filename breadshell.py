@@ -59,8 +59,8 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-dev5'
-versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build
+version = '0.5-pre1'
+versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
 os.system('clear')
@@ -422,8 +422,12 @@ def main():
         elif cmd.startswith('settings'):
             print('which setting would you like to change?')
 
-            for key, value in settings.items():
-                print(f"{key} - {c.cyan}{value}")
+            if settings == {}:
+                throwerror(f'No settings were found, or there was an error reading settings.ini ({settingspath})')
+                main()
+            else:
+                for key, value in settings.items():
+                    print(f"{key} - {c.cyan}{value}")
 
             while True:
                 setting = input(f'{c.cyan}settings{c.r} > ')
