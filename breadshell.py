@@ -59,7 +59,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-dev4'
+version = '0.5-dev5'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -96,11 +96,49 @@ try:
 
     # if this doesn't work, it will give an error, which is how this works
     os.chdir('/usr/src/breadshell')
+    os.chdir(currentdir)
     if scriptdir == '/usr/src/breadshell':
         installed = True
         runfrominstall = True
+
+        # now time to load settings
+        settingsdir = f'/home/{os.getlogin()}/Documents/breadshell-config'
+        settingspath = settingsdir+'/settings.ini'
+        # read the settings and return all key/value pairs
+        def read_settings():
+            config = {}
+            # create the file if it doesn't already exist
+            try:
+                with open(settingspath, 'a') as file:
+                    pass
+            except:
+                os.mkdir(settingsdir)
+                with open(settingspath, 'a') as file:
+                    pass
+            
+            with open(settingspath, 'r') as file:
+                for line in file:
+                    # skip empty lines and comment lines
+                    if line.strip() and not line.startswith('#'):
+                        key, value = line.strip().split('=',1)
+                        # remove quotes
+                        value = value.strip('"').strip("'")
+                        config[key] = value
+            return config
+        
+        # overwrite the settings and add new values
+        def add_settings(key, value):
+            config = read_settings()
+            config[key] = value
+            # write to the file
+            with open(settingspath, 'w') as file:
+                for key, value in config.items():
+                    file.write(f'{key}={value}\n')
+
+        settings = read_settings()
+        
     else:
-        print(f'{c.red}breadshell is installed, but you are running it from a file instead{c.r}')
+        print(f'{c.red}you are running breadshell from a file, settings will not load and logs will not be made{c.r}')
         installed = True
         runfrominstall = False
 
@@ -108,7 +146,7 @@ try:
     os.chdir(currentdir)
 
 except:
-    print(f'{c.red}breadshell is not installed, install it for more functionality{c.r}')
+    print(f'{c.red}breadshell is not installed, install it for settings and more{c.r}')
     installed = False
     runfrominstall = False
 
