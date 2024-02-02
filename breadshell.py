@@ -59,7 +59,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre1'
+version = '0.5-pre1a'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -427,7 +427,7 @@ def main():
                 main()
             else:
                 for key, value in settings.items():
-                    print(f"{key} - {c.cyan}{value}")
+                    print(f"{key} - {c.cyan}{value}{c.r}")
 
             while True:
                 setting = input(f'{c.cyan}settings{c.r} > ')
@@ -436,10 +436,13 @@ def main():
                     newValue = input(f'{c.cyan}{setting}{c.r} > ')
                     if newValue.lower() == 'true':
                         add_settings(setting,True)
+                        break
                     elif newValue.lower() == 'false':
                         add_settings(setting,False)
+                        break
                     else:
                         add_settings(setting,newValue)
+                        break
                 elif setting == 'exit':
                     break
                 else:
