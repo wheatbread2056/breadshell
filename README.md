@@ -4,13 +4,6 @@ to install:
 `cd path/to/breadshell` (replacing path/to with the actual path to the folder, usually `Downloads/breadshell`)
 then `bash install.sh`
 
-
-known bugs:
-- doesn't work on konsole (kde) for some reason
-- ctrl+c crashes breadshell
-- invalid options break butils/bgames
-
-
 update log + roadmap:
 
 **ancient updates**
