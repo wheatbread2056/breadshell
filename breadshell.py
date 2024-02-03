@@ -1,35 +1,14 @@
 # IMPORT ALL DEPENDENCIES
 
-# import os (needed to import others)
-try:
-    import os
-except:
-    print('os not installed, you must install it before using breadshell')
-    exit()
+# built-in libraries
+import os
+import time
+import datetime
+import random
+import subprocess
+import socket
 
-# import time
-try:
-    import time
-except:
-    print('time not installed, installing now')
-    os.system('sudo apt install python3-time -y')
-    import time
-
-# import datetime
-try:
-    import datetime
-except:
-    print('datetime not installed, installing now')
-    os.system('sudo apt install python3-datetime -y')
-    import datetime
-
-# import random
-try:
-    import random
-except:
-    print('random not installed, installing now')
-    os.system('sudo apt install python3-random -y')
-    import random
+# the point of this code is to install the modules if the user doesn't already have them installed
 
 # import colorama
 try:
@@ -39,27 +18,11 @@ except:
     os.system('sudo apt install python3-colorama -y')
     import colorama
 
-# import subprocess
-try:
-    import subprocess
-except:
-    print('subprocess not installed, installing now')
-    os.system('sudo apt install python3-subprocess -y')
-    import subprocess
-
-# import socket
-try:
-    import socket
-except:
-    print('socket not installed, installing now')
-    os.system('sudo apt install python3-socket -y')
-    import socket
-
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre1a'
+version = '0.5-pre1b'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -95,7 +58,7 @@ try:
     scriptdir = os.path.dirname(__file__)
 
     # now time to load settings
-    settingsdir = f'/home/{os.getlogin()}/Documents/breadshell-config'
+    settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
     settingspath = settingsdir+'/settings.ini'
     # read the settings and return all key/value pairs
     def read_settings():
