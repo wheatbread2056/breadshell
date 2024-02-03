@@ -26,7 +26,7 @@ update log + roadmap:
 **0.5 (in progress)**
 
 - logging for debugging and troubleshooting
-- settings
+- settings (done)
 - option to use breadshell as the default shell (done)
 
 **1.0**
