@@ -266,6 +266,13 @@ def utillauncher():
         print(f'Loading {utilities[int(utility)-1]}...')
         exec(f'startu_{utilities[int(utility)-1]}()')
 
+badStart = False
+def reportBadStart(a):
+    if badStart == False:
+        print(f'{c.red}{a}{c.r}')
+        print(f'{c.red}username will not be loaded to fix compatibility issues{c.r}')
+        badStart = True
+
 # start of program, shown when opening the file
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
@@ -275,9 +282,9 @@ def main():
         # main input (user@hostname path/to/directory > command typed in)
         try:
             cmd = input(f"{c.blue}{os.getlogin()}@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
-        except:
-            fatalerror()
-
+        except Exception as e:
+            reportBadStart(e)
+            cmd = input(f"{c.blue}user@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
         # for special commands
             
         # change directory (cd)
