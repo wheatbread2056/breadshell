@@ -178,8 +178,10 @@ def startu_calculator():
         elif cmd == '9+10':
             print(21)
         # as of 0.5-pre1d the user can no longer execute any command in the calculator
-        elif cmd.startswith('exec('):
+        elif cmd.startswith('exec') or cmd.startswith('os') or cmd.startswith('subprocess') or cmd.startswith('start') or cmd.startswith('main') or cmd.startswith('utillauncher') or cmd.startswith('games'):
             throwerror()
+        elif cmd == '':
+            pass
         else:
             try:
                 # print() is needed because simply executing 1+1 does not display 2
@@ -236,7 +238,7 @@ def utillauncher():
     globalversion = '0.3'
     # list amount of games here
     utilities = ['colortester','calculator','python','networktest']
-    versions = ['1.1','1.0','1.0','0.1']
+    versions = ['1.1','1.1','1.0','0.1']
 
     print(f'bread utilities version {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
