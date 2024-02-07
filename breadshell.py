@@ -23,7 +23,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre1c'
+version = '0.5-pre1d'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -177,6 +177,9 @@ def startu_calculator():
         # funny easter egg
         elif cmd == '9+10':
             print(21)
+        # as of 0.5-pre1d the user can no longer execute any command in the calculator
+        elif cmd.startswith('exec('):
+            throwerror()
         else:
             try:
                 # print() is needed because simply executing 1+1 does not display 2
@@ -198,7 +201,9 @@ def startu_python():
                 throwerror()
 
 def startu_networktest():
-    print(f'network tester')
+    print(f'network tester v0.1')
+    rt = ping_ip('8.8.8.8')
+    print(f'{rt}ms')
 
 
 # game launcher
@@ -226,9 +231,6 @@ def games():
         exec(f'startg_{games[int(game)-1]}()')
 
 # utility launcher (totally not just modified game launcher)
-        
-def get_version(name):
-    return name
 
 def utillauncher():
     globalversion = '0.3'
