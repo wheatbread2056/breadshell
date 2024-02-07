@@ -136,54 +136,17 @@ def startu_colortester():
     for i in range(4096):
         a = random.randint(0,len(chars)-1)
         char = chars[a]
-        b = random.randint(1,9)
 
-        # wow this code is inefficient
-
-        # skipping d since c is used for foreground colors
-        if b == 1:
-            d = c.red
-        elif b == 2:
-            d = c.yellow
-        elif b == 3:
-            d = c.green
-        elif b == 4:
-            d = c.blue
-        elif b == 5:
-            d = c.cyan
-        elif b == 6:
-            d = c.magenta
-        elif b == 7:
-            d = c.white
-        elif b == 8:
-            d = c.black
-        elif b == 9:
-            d = c.r
-
-        # reroll colors to be used for background
-        b = random.randint(1,9)
-
-        if b == 1:
-            e = bc.red
-        elif b == 2:
-            e = bc.yellow
-        elif b == 3:
-            e = bc.green
-        elif b == 4:
-            e = bc.blue
-        elif b == 5:
-            e = bc.cyan
-        elif b == 6:
-            e = bc.magenta
-        elif b == 7:
-            e = bc.white
-        elif b == 8:
-            e = bc.black
-        elif b == 9:
-            e = bc.r
+        # define colors by lists instead of classes
+        foregroundColors = [c.red,c.yellow,c.green,c.blue,c.cyan,c.magenta,c.white,c.black,c.r]
+        backgroundColors = [bc.red,bc.yellow,bc.green,bc.blue,bc.cyan,bc.magenta,bc.white,bc.black,bc.r]
+        # get random item in the lists
+        b = foregroundColors[random.randint(0,len(foregroundColors)-1)]
+        # used _c here since c is already used for the main colors class
+        _c = backgroundColors[random.randint(0,len(foregroundColors)-1)]
 
         # add it to the main string
-        str=str+d+e+char
+        str=str+b+_c+char
 
     # +c.r+bc.r is needed to reset the colors
     print(str+c.r+bc.r)
