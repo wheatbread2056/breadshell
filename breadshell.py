@@ -7,6 +7,7 @@ import datetime
 import random
 import subprocess
 import socket
+import re
 
 # the point of this code is to install the modules if the user doesn't already have them installed
 
@@ -51,6 +52,22 @@ class bc:
     white = colorama.Back.WHITE
     black = colorama.Back.BLACK
     r = colorama.Back.RESET # resets color to default
+
+# used for networktest utility
+def ping_ip(ip_address):
+    try:
+        pingOutput = subprocess.check_output(['ping', '-c', '1', ip_address]).decode('utf-8')
+        
+        timeMatch = re.search(r'time=([\d.]+) ms', pingOutput)
+        if timeMatch:
+            responseTime = float(timeMatch.group(1))
+            return responseTime
+        else:
+            return None
+        
+    except subprocess.CalledProcessError:
+        # Handle if the ping command fails
+        return None
 
 # check if breadshell is installed
 try:
@@ -180,6 +197,9 @@ def startu_python():
             except:
                 throwerror()
 
+def startu_networktest():
+    print(f'network tester')
+
 
 # game launcher
 def games():
@@ -206,17 +226,22 @@ def games():
         exec(f'startg_{games[int(game)-1]}()')
 
 # utility launcher (totally not just modified game launcher)
+        
+def get_version(name):
+    return name
+
 def utillauncher():
-    globalversion = '0.2'
+    globalversion = '0.3'
     # list amount of games here
-    utilities = ['colortester','calculator','python']
+    utilities = ['colortester','calculator','python','networktest']
+    versions = ['1.1','1.0','1.0','0.1']
 
     print(f'bread utilities version {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
 
     i = 1
     for utility in utilities:
-        print(f'{c.yellow}{i} - {utility}')
+        print(f'{c.yellow}{i} - {utility} {c.cyan}v{versions[i-1]}{c.r}')
         i += 1
 
     print(f'{c.yellow}exit - exit')
