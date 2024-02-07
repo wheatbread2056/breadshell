@@ -22,7 +22,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre1b'
+version = '0.5-pre1c'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -266,10 +266,11 @@ def utillauncher():
         print(f'Loading {utilities[int(utility)-1]}...')
         exec(f'startu_{utilities[int(utility)-1]}()')
 
-global badStart
 badStart = False
+
 def reportBadStart(a):
-    if badStart == False:
+    global badStart
+    if not badStart:
         print(f'{c.red}{a}{c.r}')
         print(f'{c.red}username will not be loaded to fix compatibility issues{c.r}')
         badStart = True
