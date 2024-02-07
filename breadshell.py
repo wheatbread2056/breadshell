@@ -266,6 +266,7 @@ def utillauncher():
         print(f'Loading {utilities[int(utility)-1]}...')
         exec(f'startu_{utilities[int(utility)-1]}()')
 
+global badStart
 badStart = False
 def reportBadStart(a):
     if badStart == False:
