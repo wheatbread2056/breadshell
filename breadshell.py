@@ -3,6 +3,7 @@
 # built-in libraries
 import os
 import time
+import sys
 import datetime
 import random
 import subprocess
@@ -11,47 +12,77 @@ import re
 
 # the point of this code is to install the modules if the user doesn't already have them installed
 
+DISABLE_COLORS = False
 # import colorama
 try:
     import colorama
 except:
-    print('colorama not installed, installing now')
-    os.system('sudo apt install python3-colorama -y')
-    import colorama
+    try:
+        print('colorama not installed, installing now')
+        os.system('sudo apt install python3-colorama -y')
+        import colorama
+    except:
+        print('FAILED TO INSTALL, DISABLING COLORS')
+        DISABLE_COLORS = True
 
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre1d'
+version = '0.5-pre2'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
 os.system('clear')
 
 # define colors
-class c:
-    red = colorama.Fore.RED
-    yellow = colorama.Fore.YELLOW
-    green = colorama.Fore.GREEN
-    blue = colorama.Fore.BLUE
-    magenta = colorama.Fore.MAGENTA
-    cyan = colorama.Fore.CYAN
-    white = colorama.Fore.WHITE
-    black = colorama.Fore.BLACK
-    r = colorama.Fore.RESET # resets color to default
+if DISABLE_COLORS == True:
+    # empty classes so there's no undefined "c.red undefined" errors
+    class c:
+        red = ''
+        yellow = ''
+        green = ''
+        blue = ''
+        magenta = ''
+        cyan = ''
+        white = ''
+        black = ''
+        r = ''
 
-# background colors
-class bc:
-    red = colorama.Back.RED
-    yellow = colorama.Back.YELLOW
-    green = colorama.Back.GREEN
-    blue = colorama.Back.BLUE
-    magenta = colorama.Back.MAGENTA
-    cyan = colorama.Back.CYAN
-    white = colorama.Back.WHITE
-    black = colorama.Back.BLACK
-    r = colorama.Back.RESET # resets color to default
+    class bc:
+        red = ''
+        yellow = ''
+        green = ''
+        blue = ''
+        magenta = ''
+        cyan = ''
+        white = ''
+        black = ''
+        r = ''
+else:
+    # foreground colors
+    class c:
+        red = colorama.Fore.RED
+        yellow = colorama.Fore.YELLOW
+        green = colorama.Fore.GREEN
+        blue = colorama.Fore.BLUE
+        magenta = colorama.Fore.MAGENTA
+        cyan = colorama.Fore.CYAN
+        white = colorama.Fore.WHITE
+        black = colorama.Fore.BLACK
+        r = colorama.Fore.RESET # resets color to default
+
+    # background colors
+    class bc:
+        red = colorama.Back.RED
+        yellow = colorama.Back.YELLOW
+        green = colorama.Back.GREEN
+        blue = colorama.Back.BLUE
+        magenta = colorama.Back.MAGENTA
+        cyan = colorama.Back.CYAN
+        white = colorama.Back.WHITE
+        black = colorama.Back.BLACK
+        r = colorama.Back.RESET # resets color to default
 
 # used for networktest utility
 def ping_ip(ip_address):
@@ -143,6 +174,16 @@ def fatalerror(msg='A fatal error has occured, exiting immediately'):
     exit()
 
 # game scripts
+    
+def startg_rpg_test():
+    rpgversion = '0.1'
+    inventory = {
+        'b': 'balls'
+    }
+    print(f'Welcome to RPG Test {c.cyan}{rpgversion}{c.r}')
+    while True:
+        print('You have ')
+        print(inventory['b'])
 
 # utility scripts
 
@@ -210,16 +251,17 @@ def startu_networktest():
 
 # game launcher
 def games():
-    globalversion = '0.2'
+    globalversion = '0.3'
     # list amount of games here
-    games = ['GAMES COMING SOON']
+    games = ['rpg_test']
+    versions = ['INITIAL_VERSION']
 
     print(f'bread games version {globalversion}')
     print(f'please select the game you would like to start ({len(games)} found):')
 
     i = 1
     for game in games:
-        print(f'{c.yellow}{i} - {game}')
+        print(f'{c.yellow}{i} - {game} {c.cyan}{versions[i-1]}{c.r}')
         i += 1
     
     print(f'{c.yellow}exit - exit')
@@ -237,7 +279,8 @@ def games():
 def utillauncher():
     globalversion = '0.3'
     # list amount of games here
-    utilities = ['colortester','calculator','python','networktest']
+    #------------------- NOTE: add 'networktest' utility when finished -------------
+    utilities = ['colortester','calculator','python',]
     versions = ['1.1','1.1','1.0','0.1']
 
     print(f'bread utilities version {globalversion}')
@@ -245,7 +288,7 @@ def utillauncher():
 
     i = 1
     for utility in utilities:
-        print(f'{c.yellow}{i} - {utility} {c.cyan}v{versions[i-1]}{c.r}')
+        print(f'{c.yellow}{i} - {utility} {c.cyan}{versions[i-1]}{c.r}')
         i += 1
 
     print(f'{c.yellow}exit - exit')
