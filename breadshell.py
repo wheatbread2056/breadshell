@@ -21,17 +21,28 @@ try:
 except:
     try:
         print('colorama not installed, installing now')
-        os.system('sudo apt install python3-colorama -y')
+        os.system('pip install colorama --break-system-packages')
         import colorama
     except:
         print('FAILED TO INSTALL, DISABLING COLORS')
         DISABLE_COLORS = True
 
+# import playsound (for beeper utility)
+try:
+    from playsound import playsound
+except:
+    try:
+        print('playsound not installed, installing now')
+        os.system('pip install playsound --break-system-packages')
+        from playsound import playsound
+    except:
+        print('FAILED TO INSTALL, ANYTHING DEPENDENT ON THE PLAYSOUND MODULE WILL NOT WORK')
+
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre2'
+version = '0.5-pre2a'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -178,43 +189,105 @@ def fatalerror(msg='A fatal error has occured, exiting immediately'):
 # game scripts
     
 def startg_rpg_test():
-    rpgversion = '0.1'
+    rpgversion = '0.2'
+    print('What is your name? (leave blank for PLAYER)')
+    name = input()
+    if name == '':
+        name = 'PLAYER'
+    print('What is your gender? (leave blank for random)')
+    gender = input()
+    if gender == '':
+        genders = ['male','female'] # there are only two genders
+        gender = genders[random.randint(0,1)]
     stats = {
         'level': 1,
         'xptolvl': 100,
         'xp': 0,
         'maxhp': 100,
         'hp': 'UNDEFINED',
-        'gender': 'UNDEFINED',
+        'gender': gender,
         'regenspd': 1,
-        'name': 'UNDEFINED',
+        'name': name,
+    }
+    chunkdata = []
+    data = {
+        'x': 16,
+        'y': 8,
+        'xc': 0,
+        'yc': 0,
     }
     # set hp to maxhp
     stats['hp'] = stats['maxhp']
     inventory = {
-        'gold': 1440,
+        'gold': 0,
         'weapon': 'nuclear bomb',
+        'armor': 'NONE',
     }
     def main(stdscr):
         curses.curs_set(0)  # Hide the cursor
-        
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        stdscr.bkgd(' ', curses.color_pair(1))
 
-        max_y, max_x = stdscr.getmaxyx()
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_RED)
+
+        stdscr.nodelay(1)
 
         while True:
+            max_y, max_x = stdscr.getmaxyx()
+
+            # user input
+
+            key = stdscr.getch()
+
+            if key == curses.KEY_LEFT:
+                data['x']-=1
+            if key == curses.KEY_RIGHT:
+                data['x']+=1
+            if key == curses.KEY_UP:
+                data['y']-=1
+            if key == curses.KEY_DOWN:
+                data['y']+=1
+
+            # world gen
+            if chunkdata == []:
+                for i in range(16):
+                    buffer = ''
+                    for i in range(32):
+                        possibleChars = [' ',' ',' ',' ',' ','#','.','|']
+                        buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
+                    chunkdata.append(buffer)
             stdscr.clear()
             str1 = f"❤️  {stats['hp']}/{stats['maxhp']}"
             str2 = f"💰 ${inventory['gold']}"
             str3 = f"LVL {stats['level']} ({stats['xp']}/{stats['xptolvl']} xp)"
+            str1a = f"x: {data['x']+data['xc']*16}, y: {data['y']+data['yc']*16}"
+            str1b = "press E for inventory"
+            str1c = f"selected weapon: {inventory['weapon']}"
+
+            # world rendering
+
+            stdscr.addstr(5, int(max_x/2) - int(len(chunkdata[0])/2)-1, '0'*len(chunkdata[0])+'0'*2)
+            for i in range(len(chunkdata)):
+                stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[i])/2)-1, '0'+chunkdata[i]+'0')
+            stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[i])/2)-1, '0'+chunkdata[i]+'0')
+            stdscr.addstr(22, int(max_x/2) - int(len(chunkdata[0])/2)-1, '0'*len(chunkdata[0])+'0'*2)
+
+            # player rendering
+
+            stdscr.addstr(6+data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
+
+            # bottom gui
 
             stdscr.addstr(max_y - 1, 0, str1)
-            stdscr.addstr(max_y - 1, max_x - 2 - len(str2), str2)
+            stdscr.addstr(max_y - 1, max_x - 3 - len(str2), str2)
             stdscr.addstr(max_y - 1, int(max_x/2) - int(len(str3)/2), str3)
 
+            # top gui
+
+            stdscr.addstr(0, 0, str1a)
+            stdscr.addstr(0, int(max_x/2) - int(len(str1b)/2), str1b)
+            stdscr.addstr(0, max_x - 1 - len(str1c), str1c)
+
             stdscr.refresh()
-            time.sleep(0.5)  # Adjust the sleep time as needed
+            time.sleep(1/30) # 30 fps
 
     curses.wrapper(main)
 
@@ -287,7 +360,7 @@ def games():
     globalversion = '0.3'
     # list amount of games here
     games = ['rpg_test']
-    versions = ['INITIAL_VERSION']
+    versions = ['0.2']
 
     print(f'bread games version {globalversion}')
     print(f'please select the game you would like to start ({len(games)} found):')
