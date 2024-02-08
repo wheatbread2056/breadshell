@@ -272,7 +272,7 @@ def startg_rpg_test():
 
             # player rendering
 
-            stdscr.addstr(22-data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
+            stdscr.addstr(21-data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
 
             # bottom gui
 
