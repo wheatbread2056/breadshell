@@ -242,9 +242,9 @@ def startg_rpg_test():
             if key == curses.KEY_RIGHT:
                 data['x']+=1
             if key == curses.KEY_UP:
-                data['y']-=1
-            if key == curses.KEY_DOWN:
                 data['y']+=1
+            if key == curses.KEY_DOWN:
+                data['y']-=1
 
             # world gen
             if chunkdata == []:
@@ -272,7 +272,7 @@ def startg_rpg_test():
 
             # player rendering
 
-            stdscr.addstr(6+data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
+            stdscr.addstr(22-data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
 
             # bottom gui
 
