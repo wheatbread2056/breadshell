@@ -2,8 +2,10 @@
 
 # built-in libraries
 import os
+import curses
 import time
 import sys
+import threading
 import datetime
 import random
 import subprocess
@@ -177,13 +179,44 @@ def fatalerror(msg='A fatal error has occured, exiting immediately'):
     
 def startg_rpg_test():
     rpgversion = '0.1'
-    inventory = {
-        'b': 'balls'
+    stats = {
+        'level': 1,
+        'xptolvl': 100,
+        'xp': 0,
+        'maxhp': 100,
+        'hp': 'UNDEFINED',
+        'gender': 'UNDEFINED',
+        'regenspd': 1,
+        'name': 'UNDEFINED',
     }
-    print(f'Welcome to RPG Test {c.cyan}{rpgversion}{c.r}')
-    while True:
-        print('You have ')
-        print(inventory['b'])
+    # set hp to maxhp
+    stats['hp'] = stats['maxhp']
+    inventory = {
+        'gold': 1440,
+        'weapon': 'nuclear bomb',
+    }
+    def main(stdscr):
+        curses.curs_set(0)  # Hide the cursor
+        
+        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
+        stdscr.bkgd(' ', curses.color_pair(1))
+
+        max_y, max_x = stdscr.getmaxyx()
+
+        while True:
+            stdscr.clear()
+            str1 = f"❤️  {stats['hp']}/{stats['maxhp']}"
+            str2 = f"💰 ${inventory['gold']}"
+            str3 = f"LVL {stats['level']} ({stats['xp']}/{stats['xptolvl']} xp)"
+
+            stdscr.addstr(max_y - 1, 0, str1)
+            stdscr.addstr(max_y - 1, max_x - 2 - len(str2), str2)
+            stdscr.addstr(max_y - 1, int(max_x/2) - int(len(str3)/2), str3)
+
+            stdscr.refresh()
+            time.sleep(0.5)  # Adjust the sleep time as needed
+
+    curses.wrapper(main)
 
 # utility scripts
 
@@ -456,6 +489,10 @@ def main():
                 else:
                     throwerror('Invalid setting')
 
+        elif cmd.startswith('kill yourself'):
+            print('Ok, closing in 5 seconds...')
+            time.sleep(5)
+            exit()
 
         # if none of the above commands were selected, it will run this (run any command inside the input)
             
