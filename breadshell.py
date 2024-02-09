@@ -209,7 +209,7 @@ def startg_rpg_test():
         'regenspd': 1,
         'name': name,
     }
-    chunkdata = []
+    chunkdata = {}
     data = {
         'x': 16,
         'y': 8,
@@ -223,6 +223,27 @@ def startg_rpg_test():
         'weapon': 'nuclear bomb',
         'armor': 'NONE',
     }
+
+    # world gen
+    def genchunk():
+        try:
+            if chunkdata[f"chunk{data['xc']}_{data['yc']}"] == []:
+                for i in range(16):
+                    buffer = ''
+                    for i in range(32):
+                        possibleChars = [' ',' ',' ',' ',' ','#','.','|']
+                        buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
+                    chunkdata[f"chunk{data['xc']}_{data['yc']}"].append(buffer)
+        except KeyError:
+            chunkdata[f"chunk{data['xc']}_{data['yc']}"] = []
+            for i in range(16):
+                buffer = ''
+                for i in range(32):
+                    possibleChars = [' ',' ',' ',' ',' ','#','.','|']
+                    buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
+                chunkdata[f"chunk{data['xc']}_{data['yc']}"].append(buffer)
+    genchunk()
+
     def main(stdscr):
         curses.curs_set(0)  # Hide the cursor
 
@@ -246,33 +267,45 @@ def startg_rpg_test():
             if key == curses.KEY_DOWN:
                 data['y']-=1
 
-            # world gen
-            if chunkdata == []:
-                for i in range(16):
-                    buffer = ''
-                    for i in range(32):
-                        possibleChars = [' ',' ',' ',' ',' ','#','.','|']
-                        buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
-                    chunkdata.append(buffer)
+            # for RIGHT border
+            if data['x'] >= 32:
+                data['x']-=32
+                data['xc']+=1
+                genchunk()
+            # for LEFT border
+            if data['x'] < 0:
+                data['x']+=32
+                data['xc']-=1
+                genchunk()
+            # for TOP border
+            if data['y'] >= 16:
+                data['y']-=16
+                data['yc']+=1
+                genchunk()
+            # for BOTTOM border
+            if data['y'] < 0:
+                data['y']+=16
+                data['yc']-=1
+                genchunk()
+
             stdscr.clear()
             str1 = f"❤️  {stats['hp']}/{stats['maxhp']}"
             str2 = f"💰 ${inventory['gold']}"
             str3 = f"LVL {stats['level']} ({stats['xp']}/{stats['xptolvl']} xp)"
-            str1a = f"x: {data['x']+data['xc']*16}, y: {data['y']+data['yc']*16}"
+            str1a = f"x: {data['x']+data['xc']*32}, y: {data['y']+data['yc']*16}"
             str1b = "press E for inventory"
             str1c = f"selected weapon: {inventory['weapon']}"
 
             # world rendering
 
-            stdscr.addstr(5, int(max_x/2) - int(len(chunkdata[0])/2)-1, '0'*len(chunkdata[0])+'0'*2)
-            for i in range(len(chunkdata)):
-                stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[i])/2)-1, '0'+chunkdata[i]+'0')
-            stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[i])/2)-1, '0'+chunkdata[i]+'0')
-            stdscr.addstr(22, int(max_x/2) - int(len(chunkdata[0])/2)-1, '0'*len(chunkdata[0])+'0'*2)
+            stdscr.addstr(5, int(max_x/2) - int(len(chunkdata['chunk0_0'][0])/2)-1, '0'*len(chunkdata['chunk0_0'][0])+'0'*2)
+            for i in range(len(chunkdata[f"chunk{data['xc']}_{data['yc']}"])):
+                stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[f"chunk{data['xc']}_{data['yc']}"][i])/2)-1, '0'+chunkdata[f"chunk{data['xc']}_{data['yc']}"][i]+'0')
+            stdscr.addstr(22, int(max_x/2) - int(len(chunkdata['chunk0_0'][0])/2)-1, '0'*len(chunkdata['chunk0_0'][0])+'0'*2)
 
             # player rendering
 
-            stdscr.addstr(21-data['y'],int(max_x/2) - int(len(chunkdata[i])/2)+data['x'],'&', curses.color_pair(1))
+            stdscr.addstr(21-data['y'],int(max_x/2) - int(len(chunkdata['chunk0_0'][i])/2)+data['x'],'&', curses.color_pair(1))
 
             # bottom gui
 
