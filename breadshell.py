@@ -6,6 +6,7 @@ import curses
 import time
 import sys
 import threading
+import base64
 import datetime
 import random
 import subprocess
@@ -231,7 +232,7 @@ def startg_rpg_test():
                 for i in range(16):
                     buffer = ''
                     for i in range(32):
-                        possibleChars = [' ',' ',' ',' ',' ','#','.','|']
+                        possibleChars = [' ',' ',' ',' ',' ','C','.']
                         buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
                     chunkdata[f"chunk{data['xc']}_{data['yc']}"].append(buffer)
         except KeyError:
@@ -239,12 +240,22 @@ def startg_rpg_test():
             for i in range(16):
                 buffer = ''
                 for i in range(32):
-                    possibleChars = [' ',' ',' ',' ',' ','#','.','|']
+                    possibleChars = [' ',' ',' ',' ',' ','C','.']
                     buffer = buffer + possibleChars[random.randint(0,len(possibleChars)-1)]
                 chunkdata[f"chunk{data['xc']}_{data['yc']}"].append(buffer)
     genchunk()
 
+    def regenchunk():
+        del chunkdata[f"chunk{data['xc']}_{data['yc']}"]
+        genchunk()
+
     def main(stdscr):
+        tips = ['press E for inventory','press - to exit','press ENTER to attack','press SHIFT to use']
+        current_tip = tips[random.randint(0,len(tips)-1)]
+        tip_delay = 150 # 150 frames tip delay (5s)
+
+        DEBUG_MODE = False
+
         curses.curs_set(0)  # Hide the cursor
 
         curses.init_pair(1, curses.COLOR_RED, curses.COLOR_RED)
@@ -252,20 +263,56 @@ def startg_rpg_test():
         stdscr.nodelay(1)
 
         while True:
+            prevxy = [data['x'],data['y']]
+            curchunk = chunkdata[f"chunk{data['xc']}_{data['yc']}"]
+            origchunk = chunkdata["chunk0_0"]
+
             max_y, max_x = stdscr.getmaxyx()
 
             # user input
 
             key = stdscr.getch()
 
-            if key == curses.KEY_LEFT:
+            # arrow keys
+            if key == curses.KEY_LEFT or key == ord('a'):
                 data['x']-=1
-            if key == curses.KEY_RIGHT:
+            if key == curses.KEY_RIGHT or key == ord('d'):
                 data['x']+=1
-            if key == curses.KEY_UP:
+            if key == curses.KEY_UP or key == ord('w'):
                 data['y']+=1
-            if key == curses.KEY_DOWN:
+            if key == curses.KEY_DOWN or key == ord('s'):
                 data['y']-=1
+
+            # other keys
+            if key == ord('p'): # toggle debug
+                if DEBUG_MODE == False:
+                    DEBUG_MODE = True
+                else:
+                    DEBUG_MODE = False
+            if key == ord('-'): # exit
+                break
+
+            # debug mode ONLY
+            if DEBUG_MODE == True:
+                if key == ord('q'): # regen chunk
+                    regenchunk()
+                if key == ord('z'): # go to chunk 0,0
+                    data['xc'],data['yc'] = 0,0
+                if key == ord('x'): # increment gold
+                    inventory['gold']+=1
+                if key == ord('c'): # decrement gold
+                    inventory['gold']-=1
+
+            # player collision
+            '''
+            if curchunk[data['y']][data['x']] == 'C': # coin collision
+                inventory['gold']+=1
+                tempVariable1 = list(curchunk[data['y']])  
+                tempVariable1[data['x']] = ' '
+                ''.join(tempVariable1)
+                chunkdata[f"chunk{data['xc']}_{data['yc']}"][data['y']] = ''
+                chunkdata[f"chunk{data['xc']}_{data['yc']}"][data['y']] = tempVariable1
+            '''
 
             # for RIGHT border
             if data['x'] >= 32:
@@ -293,34 +340,57 @@ def startg_rpg_test():
             str2 = f"💰 ${inventory['gold']}"
             str3 = f"LVL {stats['level']} ({stats['xp']}/{stats['xptolvl']} xp)"
             str1a = f"x: {data['x']+data['xc']*32}, y: {data['y']+data['yc']*16}"
-            str1b = "press E for inventory"
+            str1b = current_tip
             str1c = f"selected weapon: {inventory['weapon']}"
+            # activated with debug mode
+            dstr1 = f"[CHUNK] x: {data['xc']}, y: {data['yc']}"
+            dstr2 = f"[POS IN CHUNK] x: {data['x']}, y: {data['y']}"
+            dstr3 = "(q) regenerate chunk"
+            dstr4 = "(z) return to chunk 0,0"
+            dstr5 = "(x) increment gold"
+            dstr6 = "(c) decrement gold"
 
-            # world rendering
+            # add strings to the screen
 
-            stdscr.addstr(5, int(max_x/2) - int(len(chunkdata['chunk0_0'][0])/2)-1, '0'*len(chunkdata['chunk0_0'][0])+'0'*2)
-            for i in range(len(chunkdata[f"chunk{data['xc']}_{data['yc']}"])):
-                stdscr.addstr(i + 6, int(max_x/2) - int(len(chunkdata[f"chunk{data['xc']}_{data['yc']}"][i])/2)-1, '0'+chunkdata[f"chunk{data['xc']}_{data['yc']}"][i]+'0')
-            stdscr.addstr(22, int(max_x/2) - int(len(chunkdata['chunk0_0'][0])/2)-1, '0'*len(chunkdata['chunk0_0'][0])+'0'*2)
+            try:
+                # world rendering
 
-            # player rendering
+                stdscr.addstr(5, int(max_x/2) - int(len(origchunk[0])/2)-1, '0'*len(origchunk[0])+'0'*2)
+                for i in range(len(curchunk)):
+                    stdscr.addstr(i + 6, int(max_x/2) - int(len(curchunk[i])/2)-1, '0'+curchunk[i]+'0')
+                stdscr.addstr(22, int(max_x/2) - int(len(origchunk[0])/2)-1, '0'*len(origchunk[0])+'0'*2)
 
-            stdscr.addstr(21-data['y'],int(max_x/2) - int(len(chunkdata['chunk0_0'][i])/2)+data['x'],'&', curses.color_pair(1))
+                # player rendering
 
-            # bottom gui
+                stdscr.addstr(21-data['y'],int(max_x/2) - int(len(origchunk[i])/2)+data['x'],'&', curses.color_pair(1))
 
-            stdscr.addstr(max_y - 1, 0, str1)
-            stdscr.addstr(max_y - 1, max_x - 3 - len(str2), str2)
-            stdscr.addstr(max_y - 1, int(max_x/2) - int(len(str3)/2), str3)
+                # bottom gui
 
-            # top gui
+                stdscr.addstr(max_y - 1, 0, str1)
+                stdscr.addstr(max_y - 1, max_x - 3 - len(str2), str2)
+                stdscr.addstr(max_y - 1, int(max_x/2) - int(len(str3)/2), str3)
 
-            stdscr.addstr(0, 0, str1a)
-            stdscr.addstr(0, int(max_x/2) - int(len(str1b)/2), str1b)
-            stdscr.addstr(0, max_x - 1 - len(str1c), str1c)
+                # top gui
+
+                stdscr.addstr(0, 0, str1a)
+                stdscr.addstr(0, int(max_x/2) - int(len(str1b)/2), str1b)
+                stdscr.addstr(0, max_x - 1 - len(str1c), str1c)
+
+                # debug mode gui
+
+                if DEBUG_MODE == True:
+                    for i in range(6):
+                        exec(f'stdscr.addstr(i+1,0,dstr{i+1})')
+            except:
+                throwerror('A larger terminal is required to play rpg_test, please enlarge it and come back')
+                break
 
             stdscr.refresh()
-            time.sleep(1/30) # 30 fps
+            tip_delay-=1
+            if tip_delay <= 0:
+                current_tip = tips[random.randint(0,len(tips)-1)]
+                tip_delay = 150
+            time.sleep(1/60) # 30 fps
 
     curses.wrapper(main)
 
@@ -387,6 +457,63 @@ def startu_networktest():
     rt = ping_ip('8.8.8.8')
     print(f'{rt}ms')
 
+def startu_assistant():
+    '''
+    POSSIBLE MOODS
+    neutral = white message
+    happy = green (lime) message
+    sad = blue message
+    empathy = light blue (cyan) message
+    angry = red message
+    uncomfortable = yellow message
+    love = pink (magenta) message
+    '''
+    responses = {
+        "i'm good": ['glad to hear that!', 'happy'],
+        "i'm not doing good": ["is everything okay?", 'empathy'],
+        "i'm hungry": ["why?"],
+        "kill yourself": ["why?"],
+    }
+    def ms(a): # milliseconds
+        return a/1000
+    def botmessage(str,mood='neutral'):
+        if mood == 'neutral':
+            m = ''
+        elif mood == 'happy':
+            m = c.green
+        elif mood == 'sad':
+            m = c.blue
+        elif mood == 'empathy':
+            m = c.cyan
+        elif mood == 'angry':
+            m = c.red
+        elif mood == 'uncomfortable':
+            m = c.yellow
+        elif mood == 'love':
+            m = c.magenta
+        else:
+            m = ''
+        writtenchars = ''
+        for i in range(len(str)):
+            writtenchars+=str[i]
+            print(m+writtenchars+c.r,end='\r')
+            time.sleep(ms(35)) # 35 ms delay per char, realistic talking speed
+        print() # new line
+        time.sleep(ms(500))
+    botmessage("Hello! I'm Iris, your personal assistant.")
+    botmessage('How are you?')
+    while True:
+        userinput = input(f'{c.cyan}assistant{c.r} > ')
+        if userinput == 'exit':
+            break
+        else:
+            try:
+                botmessage(responses[userinput.lower()][0],responses[userinput.lower()][1])
+            except KeyError:
+                botmessage("Sorry, I didn't understand that.")
+            except IndexError:
+                botmessage(responses[userinput.lower()][0])
+
 
 # game launcher
 def games():
@@ -419,8 +546,8 @@ def utillauncher():
     globalversion = '0.3'
     # list amount of games here
     #------------------- NOTE: add 'networktest' utility when finished -------------
-    utilities = ['colortester','calculator','python',]
-    versions = ['1.1','1.1','1.0','0.1']
+    utilities = ['colortester','calculator','python','assistant','networktest']
+    versions = ['1.1','1.1','1.0','0.1','INITIAL_VERSION']
 
     print(f'bread utilities version {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
@@ -473,20 +600,21 @@ def main():
         # breadhelp (bhelp)
         elif cmd.startswith('bhelp'):
             print(f'''
-    breadshell version {c.cyan}{version}{c.r}
+breadshell version {c.cyan}{version}{c.r}
 
-    --- CUSTOM COMMANDS ---
+--- CUSTOM COMMANDS ---
 
-    {c.yellow}bhelp{c.r} - open this page
-    {c.yellow}bfetch{c.r} - get system information
-    {c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
-    {c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
-    {c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
-    {c.yellow}bgames{c.r} - start game launcher
-    {c.yellow}butils{c.r} - start utility launcher
-    {c.yellow}version{c.r} - displays version information
-    {c.yellow}settings{c.r} - change your breadshell settings
-    {c.red}exit{c.r} - exits breadshell
+{c.yellow}bhelp{c.r} - open this page
+{c.yellow}bfetch{c.r} - get system information (IN DEVELOPMENT)
+{c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
+{c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
+{c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
+{c.yellow}bgames{c.r} - start game launcher
+{c.yellow}butils{c.r} - start utility launcher
+{c.yellow}version{c.r} - displays version information
+{c.yellow}settings{c.r} - change your breadshell settings (IN DEVELOPMENT)
+{c.yellow}scedit{c.r} - edit, modify, and create breadshell shortcuts (IN DEVELOPMENT)
+{c.red}exit{c.r} - exits breadshell
     ''')
             
         # breadfetch (bfetch)
