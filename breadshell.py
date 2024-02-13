@@ -43,7 +43,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre2a'
+version = '0.5-pre2b'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
