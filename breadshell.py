@@ -43,7 +43,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information
-version = '0.5-pre2b'
+version = '0.5-pre3'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -97,6 +97,11 @@ else:
         white = colorama.Back.WHITE
         black = colorama.Back.BLACK
         r = colorama.Back.RESET # resets color to default
+
+    # color customization
+    class cc:
+        login = c.blue
+        dir = c.green
 
 # used for networktest utility
 def ping_ip(ip_address):
@@ -154,6 +159,23 @@ try:
                 file.write(f'{key}={value}\n')
 
     settings = read_settings()
+
+    # generate default settings
+    defaultSettings = {
+        'loginColor': 'blue',
+        'dirColor': 'green',
+    }
+    for setting in defaultSettings:
+        try:
+            print(settings[setting])
+        except:
+            add_settings(setting,defaultSettings[setting])
+    # clear console (2nd time)
+    os.system('clear')
+
+    # change colors depending on settings
+    exec(f"cc.login = c.{settings['loginColor']}")
+    exec(f"cc.dir = c.{settings['dirColor']}")
 
     # if this doesn't work, it will give an error, which is how this works
     os.chdir('/usr/src/breadshell')
@@ -374,7 +396,6 @@ def startg_rpg_test():
 
                 stdscr.addstr(0, 0, str1a)
                 stdscr.addstr(0, int(max_x/2) - int(len(str1b)/2), str1b)
-                stdscr.addstr(0, max_x - 1 - len(str1c), str1c)
 
                 # debug mode gui
 
@@ -390,7 +411,7 @@ def startg_rpg_test():
             if tip_delay <= 0:
                 current_tip = tips[random.randint(0,len(tips)-1)]
                 tip_delay = 150
-            time.sleep(1/60) # 30 fps
+            time.sleep(1/30) # 30 fps
 
     curses.wrapper(main)
 
@@ -460,59 +481,96 @@ def startu_networktest():
 def startu_assistant():
     '''
     POSSIBLE MOODS
-    neutral = white message
-    happy = green (lime) message
-    sad = blue message
-    empathy = light blue (cyan) message
-    angry = red message
-    uncomfortable = yellow message
-    love = pink (magenta) message
+    neutral = white message, 35ms char delay
+    happy = green (lime) message, 30ms char delay
+    sad = blue message, 60ms char delay
+    empathy = light blue (cyan) message, 40ms char delay
+    angry = red message, 25ms char delay
+    uncomfortable = yellow message, 45ms char delay
+    love = pink (magenta) message, 40ms char delay
     '''
+    errors = [
+        'what do you mean?',
+        "i don't know what you mean by that...",
+        "what the hell do you mean?",
+        'stop talking nonsense...',
+        "i'm sorry, can you say that again?",
+        "i couldn't hear you...",
+        "huh?",
+        "what?"
+    ]
+    blankerrors = [
+        "don't be shy, say something...",
+        "are you going to say something?",
+        "please talk to me...",
+        "hey... wake up...",
+        "WAKE UP!!!",
+    ]
     responses = {
-        "i'm good": ['glad to hear that!', 'happy'],
-        "i'm not doing good": ["is everything okay?", 'empathy'],
-        "i'm hungry": ["why?"],
+        "im good": ['glad to hear that!', 'happy'],
+        "im doing good": ['glad to hear that!', 'happy'],
+        "good": ['good!', 'happy'],
+        "im not doing good": ["is everything okay?", 'empathy'],
+        "im doing bad": ['is everything okay?', 'empathy'],
+        "im not good": ['is everything okay?', 'empathy'],
+        "bad": ['is everything good?', 'empathy'],
+        "im hungry": ["why?"],
         "kill yourself": ["why?"],
+        "because": ["because what?"],
+        "because you know": ["just tell me already", 'angry'],
+        "i will never tell you": ["kill yourself!!!", 'angry'],
+        "you suck": ["oh... i'm sorry if i didn't make you happy...", 'sad']
     }
     def ms(a): # milliseconds
         return a/1000
+    def formatinput(str):
+        return str.replace('"','').replace("'",'').replace('!','').replace('@','').replace('#','').replace('$','').replace('%','').replace('^','').replace('&','').replace('*','').replace('(','').replace(')','').replace(',','').replace('.','')
     def botmessage(str,mood='neutral'):
         if mood == 'neutral':
             m = ''
+            b = 35
         elif mood == 'happy':
             m = c.green
+            b = 30
         elif mood == 'sad':
             m = c.blue
+            b = 60
         elif mood == 'empathy':
             m = c.cyan
+            b = 40
         elif mood == 'angry':
             m = c.red
+            b = 25
         elif mood == 'uncomfortable':
             m = c.yellow
+            b = 45
         elif mood == 'love':
             m = c.magenta
+            b = 40
         else:
             m = ''
         writtenchars = ''
         for i in range(len(str)):
             writtenchars+=str[i]
             print(m+writtenchars+c.r,end='\r')
-            time.sleep(ms(35)) # 35 ms delay per char, realistic talking speed
+            time.sleep(ms(b)) # 35 ms delay per char, realistic talking speed
         print() # new line
         time.sleep(ms(500))
-    botmessage("Hello! I'm Iris, your personal assistant.")
-    botmessage('How are you?')
+    botmessage("hi! i'm iris, your personal assistant.")
+    botmessage('how are you?')
     while True:
         userinput = input(f'{c.cyan}assistant{c.r} > ')
         if userinput == 'exit':
             break
+        elif userinput == '':
+            botmessage(blankerrors[random.randint(0,len(blankerrors)-1)])
         else:
             try:
-                botmessage(responses[userinput.lower()][0],responses[userinput.lower()][1])
+                botmessage(responses[formatinput(userinput.lower())][0],responses[formatinput(userinput.lower())][1])
             except KeyError:
-                botmessage("Sorry, I didn't understand that.")
+                botmessage(errors[random.randint(0,len(errors)-1)])
             except IndexError:
-                botmessage(responses[userinput.lower()][0])
+                botmessage(responses[formatinput(userinput.lower())][0])
 
 
 # game launcher
@@ -584,7 +642,7 @@ def main():
     while True:
         # main input (user@hostname path/to/directory > command typed in)
         try:
-            cmd = input(f"{c.blue}{os.getlogin()}@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
+            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{c.r} > ")
         except Exception as e:
             reportBadStart(e)
             cmd = input(f"{c.blue}user@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
@@ -600,21 +658,21 @@ def main():
         # breadhelp (bhelp)
         elif cmd.startswith('bhelp'):
             print(f'''
-breadshell version {c.cyan}{version}{c.r}
+    breadshell version {c.cyan}{version}{c.r}
 
---- CUSTOM COMMANDS ---
+    --- CUSTOM COMMANDS ---
 
-{c.yellow}bhelp{c.r} - open this page
-{c.yellow}bfetch{c.r} - get system information (IN DEVELOPMENT)
-{c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
-{c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
-{c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
-{c.yellow}bgames{c.r} - start game launcher
-{c.yellow}butils{c.r} - start utility launcher
-{c.yellow}version{c.r} - displays version information
-{c.yellow}settings{c.r} - change your breadshell settings (IN DEVELOPMENT)
-{c.yellow}scedit{c.r} - edit, modify, and create breadshell shortcuts (IN DEVELOPMENT)
-{c.red}exit{c.r} - exits breadshell
+    {c.yellow}bhelp{c.r} - open this page
+    {c.yellow}bfetch{c.r} - get system information (IN DEVELOPMENT)
+    {c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
+    {c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
+    {c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
+    {c.yellow}bgames{c.r} - start game launcher
+    {c.yellow}butils{c.r} - start utility launcher
+    {c.yellow}version{c.r} - displays version information
+    {c.yellow}settings{c.r} - change your breadshell settings (IN DEVELOPMENT)
+    {c.yellow}scedit{c.r} - edit, modify, and create breadshell shortcuts (IN DEVELOPMENT)
+    {c.red}exit{c.r} - exits breadshell
     ''')
             
         # breadfetch (bfetch)
@@ -656,6 +714,22 @@ breadshell version {c.cyan}{version}{c.r}
         # throw a FATAL generic error, which is red...
         elif cmd.startswith('dev-generic-fatalerror'):
             fatalerror()
+
+        # set background color to a random color
+        elif cmd.startswith('dev-randombg'):
+            quickColors = [bc.red,bc.yellow,bc.green,bc.blue,bc.magenta]
+            print(quickColors[random.randint(0,len(quickColors)-1)])
+            os.system('clear')
+        
+        # reset the background color
+        elif cmd.startswith('dev-resetbg'):
+            print(bc.r)
+            os.system('clear')
+        
+        # colortest 1024 times... for some reason
+        elif cmd.startswith('dev-explosionofcolors'):
+            for i in range(1024):
+                startu_colortester()
 
         # launch games
         elif cmd.startswith('bgames'):
