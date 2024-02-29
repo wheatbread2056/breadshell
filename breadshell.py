@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4'
+version = '0.5-pre4a'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -663,21 +663,20 @@ def main():
     while True:
         tempcmd = ""
         if settings['showLogin'] == 'True':
-            tempcmd += f"{cc.login}{os.getlogin()}@{socket.gethostname()}{c.r}"
+            tempcmd += f"{cc.login}{os.getlogin()}@{socket.gethostname()}{c.r} "
         if settings['showDir'] == 'True':
-            tempcmd += f" {cc.dir}{os.getcwd()}{c.r}"
+            tempcmd += f"{cc.dir}{os.getcwd()}{c.r} "
         if settings['showPointer'] == 'True':
-            tempcmd += f"{cc.pointer} {settings['pointerChar']} {c.r}"
+            tempcmd += f"{cc.pointer}{settings['pointerChar']} {c.r}"
         tempcmd += cc.text
         # main input (user@hostname path/to/directory > command typed in) --main
         try:
             cmd = input(tempcmd)
-            cmd += c.r
+            print(c.r,end='')
         except Exception as e:
             reportBadStart(e)
             cmd = input(tempcmd)
-            cmd += c.r
-        
+            print(c.r,end='')
         # for special commands
             
         # change directory (cd)
