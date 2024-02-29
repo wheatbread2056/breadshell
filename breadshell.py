@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre3b'
+version = '0.5-pre4'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -180,6 +180,9 @@ try:
         'textColor': 'r',
         'pointerColor': 'r',
         'pointerChar': '>',
+        'showLogin': 'True',
+        'showDir': 'True',
+        'showPointer': 'True',
     }
     for setting in defaultSettings:
         try:
@@ -658,12 +661,23 @@ print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
 def main():
     while True:
+        tempcmd = ""
+        if settings['showLogin'] == 'True':
+            tempcmd += f"{cc.login}{os.getlogin()}@{socket.gethostname()}{c.r}"
+        if settings['showDir'] == 'True':
+            tempcmd += f" {cc.dir}{os.getcwd()}{c.r}"
+        if settings['showPointer'] == 'True':
+            tempcmd += f"{cc.pointer} {settings['pointerChar']} {c.r}"
+        tempcmd += cc.text
         # main input (user@hostname path/to/directory > command typed in) --main
         try:
-            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{cc.pointer} {settings['pointerChar']} {cc.text}")
+            cmd = input(tempcmd)
+            cmd += c.r
         except Exception as e:
             reportBadStart(e)
-            cmd = input(f"{c.blue}user@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
+            cmd = input(tempcmd)
+            cmd += c.r
+        
         # for special commands
             
         # change directory (cd)
