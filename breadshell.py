@@ -1,4 +1,4 @@
-# IMPORT ALL DEPENDENCIES
+# IMPORT ALL DEPENDENCIES --initial
 
 # built-in libraries
 import os
@@ -39,17 +39,28 @@ except:
     except:
         print('FAILED TO INSTALL, ANYTHING DEPENDENT ON THE PLAYSOUND MODULE WILL NOT WORK')
 
+# import distro (issue #1 https://github.com/wheatbread2056/breadshell/issues/1)
+try:
+    import distro
+except:
+    try:
+        print('distro not installed, installing now')
+        os.system('pip install playsound --break-system-packages')
+        import distro
+    except:
+        print('FAILED TO INSTALL, DEFAULTING TO APT AS PACKAGE MANAGER')
+
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
-# version number and other information
-version = '0.5-pre3'
+# version number and other information --version
+version = '0.5-pre3a'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
 os.system('clear')
 
-# define colors
+# define colors --customization
 if DISABLE_COLORS == True:
     # empty classes so there's no undefined "c.red undefined" errors
     class c:
@@ -73,6 +84,7 @@ if DISABLE_COLORS == True:
         white = ''
         black = ''
         r = ''
+
 else:
     # foreground colors
     class c:
@@ -98,10 +110,12 @@ else:
         black = colorama.Back.BLACK
         r = colorama.Back.RESET # resets color to default
 
-    # color customization
-    class cc:
-        login = c.blue
-        dir = c.green
+# color customization
+class cc:
+    login = c.blue
+    dir = c.green
+    text = c.r
+    pointer = c.r
 
 # used for networktest utility
 def ping_ip(ip_address):
@@ -119,12 +133,12 @@ def ping_ip(ip_address):
         # Handle if the ping command fails
         return None
 
-# check if breadshell is installed
+# check if breadshell is installed --installcheck
 try:
     currentdir = os.getcwd()
     scriptdir = os.path.dirname(__file__)
 
-    # now time to load settings
+    # now time to load settings --settings
     settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
     settingspath = settingsdir+'/settings.ini'
     # read the settings and return all key/value pairs
@@ -164,6 +178,8 @@ try:
     defaultSettings = {
         'loginColor': 'blue',
         'dirColor': 'green',
+        'textColor': 'r',
+        'pointerColor': 'r'
     }
     for setting in defaultSettings:
         try:
@@ -176,6 +192,8 @@ try:
     # change colors depending on settings
     exec(f"cc.login = c.{settings['loginColor']}")
     exec(f"cc.dir = c.{settings['dirColor']}")
+    exec(f"cc.text = c.{settings['textColor']}")
+    exec(f"cc.pointer = c.{settings['pointerColor']}")
 
     # if this doesn't work, it will give an error, which is how this works
     os.chdir('/usr/src/breadshell')
@@ -194,7 +212,7 @@ try:
     os.chdir(currentdir)
 
 except:
-    print(f'{c.red}breadshell is not installed{c.r}')
+    print(f'{c.red}breadshell is not installed, or an error has occured when loading{c.r}')
     installed = False
     runfrominstall = False
 
@@ -209,7 +227,7 @@ def fatalerror(msg='A fatal error has occured, exiting immediately'):
     print(f'{c.red}{msg}{c.r}')
     exit()
 
-# game scripts
+# game scripts --games
     
 def startg_rpg_test():
     rpgversion = '0.2'
@@ -415,7 +433,7 @@ def startg_rpg_test():
 
     curses.wrapper(main)
 
-# utility scripts
+# utility scripts --utilities
 
 def startu_colortester():
     # random colors+chars for 256 characters
@@ -640,9 +658,9 @@ print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
 def main():
     while True:
-        # main input (user@hostname path/to/directory > command typed in)
+        # main input (user@hostname path/to/directory > command typed in) --mainloop
         try:
-            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{c.r} > ")
+            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{cc.pointer} > {cc.text}")
         except Exception as e:
             reportBadStart(e)
             cmd = input(f"{c.blue}user@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
