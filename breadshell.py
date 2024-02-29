@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre3a'
+version = '0.5-pre3b'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -163,23 +163,23 @@ try:
                     config[key] = value
         return config
     
+    settings = read_settings()
+    
     # overwrite the settings and add new values
     def add_settings(key, value):
-        config = read_settings()
-        config[key] = value
+        settings[key] = value
         # write to the file
         with open(settingspath, 'w') as file:
-            for key, value in config.items():
+            for key, value in settings.items():
                 file.write(f'{key}={value}\n')
-
-    settings = read_settings()
 
     # generate default settings
     defaultSettings = {
         'loginColor': 'blue',
         'dirColor': 'green',
         'textColor': 'r',
-        'pointerColor': 'r'
+        'pointerColor': 'r',
+        'pointerChar': '>',
     }
     for setting in defaultSettings:
         try:
@@ -658,9 +658,9 @@ print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
 # main loop
 def main():
     while True:
-        # main input (user@hostname path/to/directory > command typed in) --mainloop
+        # main input (user@hostname path/to/directory > command typed in) --main
         try:
-            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{cc.pointer} > {cc.text}")
+            cmd = input(f"{cc.login}{os.getlogin()}@{socket.gethostname()} {cc.dir}{os.getcwd()}{cc.pointer} {settings['pointerChar']} {cc.text}")
         except Exception as e:
             reportBadStart(e)
             cmd = input(f"{c.blue}user@{socket.gethostname()} {c.green}{os.getcwd()}{c.r} > ")
@@ -787,8 +787,6 @@ def main():
 
         # edit settings
         elif cmd.startswith('settings'):
-            print('which setting would you like to change?')
-
             if settings == {}:
                 throwerror(f'No settings were found, or there was an error reading settings.ini ({settingspath})')
                 main()
@@ -797,19 +795,17 @@ def main():
                     print(f"{key} - {c.cyan}{value}{c.r}")
 
             while True:
+                print('which setting would you like to change? (type exit to leave)')
                 setting = input(f'{c.cyan}settings{c.r} > ')
                 if setting in settings:
                     print('Enter a new value:')
                     newValue = input(f'{c.cyan}{setting}{c.r} > ')
                     if newValue.lower() == 'true':
                         add_settings(setting,True)
-                        break
                     elif newValue.lower() == 'false':
                         add_settings(setting,False)
-                        break
                     else:
                         add_settings(setting,newValue)
-                        break
                 elif setting == 'exit':
                     break
                 else:
