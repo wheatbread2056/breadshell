@@ -1,3 +1,10 @@
+echo 'are you running install.sh in the directory containing breadshell.py? the installation will not work if you do not do this (Y/n)'
+read choice1
+if [ "$choice1" = 'Y' ]; then
+    echo proceeding with installation...
+else
+    exit
+fi
 # remove broken files from earlier installations
 sudo rm -rf /usr/src/breadshell
 sudo rm /bin/breadshell
