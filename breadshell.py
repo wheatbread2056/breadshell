@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4a'
+version = '0.5-pre4b'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -132,71 +132,71 @@ def ping_ip(ip_address):
     except subprocess.CalledProcessError:
         # Handle if the ping command fails
         return None
+    
+# now time to load settings --settings
+settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
+settingspath = settingsdir+'/settings.ini'
+# read the settings and return all key/value pairs
+def read_settings():
+    config = {}
+    # create the file if it doesn't already exist
+    try:
+        with open(settingspath, 'a') as file:
+            pass
+    except:
+        os.mkdir(settingsdir)
+        with open(settingspath, 'a') as file:
+            pass
+    
+    with open(settingspath, 'r') as file:
+        for line in file:
+            # skip empty lines and comment lines
+            if line.strip() and not line.startswith('#'):
+                key, value = line.strip().split('=',1)
+                # remove quotes
+                value = value.strip('"').strip("'")
+                config[key] = value
+    return config
+
+settings = read_settings()
+
+# overwrite the settings and add new values
+def add_settings(key, value):
+    settings[key] = value
+    # write to the file
+    with open(settingspath, 'w') as file:
+        for key, value in settings.items():
+            file.write(f'{key}={value}\n')
+
+# generate default settings
+defaultSettings = {
+    'loginColor': 'blue',
+    'dirColor': 'green',
+    'textColor': 'r',
+    'pointerColor': 'r',
+    'pointerChar': '>',
+    'showLogin': 'True',
+    'showDir': 'True',
+    'showPointer': 'True',
+}
+for setting in defaultSettings:
+    try:
+        print(settings[setting])
+    except:
+        add_settings(setting,defaultSettings[setting])
+# clear console (2nd time)
+os.system('clear')
+
+# change colors depending on settings
+exec(f"cc.login = c.{settings['loginColor']}")
+exec(f"cc.dir = c.{settings['dirColor']}")
+exec(f"cc.text = c.{settings['textColor']}")
+exec(f"cc.pointer = c.{settings['pointerColor']}")
 
 # check if breadshell is installed --installcheck
 try:
     currentdir = os.getcwd()
     scriptdir = os.path.dirname(__file__)
-
-    # now time to load settings --settings
-    settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
-    settingspath = settingsdir+'/settings.ini'
-    # read the settings and return all key/value pairs
-    def read_settings():
-        config = {}
-        # create the file if it doesn't already exist
-        try:
-            with open(settingspath, 'a') as file:
-                pass
-        except:
-            os.mkdir(settingsdir)
-            with open(settingspath, 'a') as file:
-                pass
-        
-        with open(settingspath, 'r') as file:
-            for line in file:
-                # skip empty lines and comment lines
-                if line.strip() and not line.startswith('#'):
-                    key, value = line.strip().split('=',1)
-                    # remove quotes
-                    value = value.strip('"').strip("'")
-                    config[key] = value
-        return config
-    
-    settings = read_settings()
-    
-    # overwrite the settings and add new values
-    def add_settings(key, value):
-        settings[key] = value
-        # write to the file
-        with open(settingspath, 'w') as file:
-            for key, value in settings.items():
-                file.write(f'{key}={value}\n')
-
-    # generate default settings
-    defaultSettings = {
-        'loginColor': 'blue',
-        'dirColor': 'green',
-        'textColor': 'r',
-        'pointerColor': 'r',
-        'pointerChar': '>',
-        'showLogin': 'True',
-        'showDir': 'True',
-        'showPointer': 'True',
-    }
-    for setting in defaultSettings:
-        try:
-            print(settings[setting])
-        except:
-            add_settings(setting,defaultSettings[setting])
-    # clear console (2nd time)
-    os.system('clear')
-
-    # change colors depending on settings
-    exec(f"cc.login = c.{settings['loginColor']}")
-    exec(f"cc.dir = c.{settings['dirColor']}")
-    exec(f"cc.text = c.{settings['textColor']}")
-    exec(f"cc.pointer = c.{settings['pointerColor']}")
 
     # if this doesn't work, it will give an error, which is how this works
     os.chdir('/usr/src/breadshell')

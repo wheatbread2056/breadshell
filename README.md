@@ -20,7 +20,7 @@ update log + roadmap:
 
 - settings (done)
 - option to use breadshell as the default shell (done)
-- full customizabiity of colors, text, etc (done)
+- full customizability of colors, text, etc (done)
 - add "shortcuts"
 
 **1.0**
