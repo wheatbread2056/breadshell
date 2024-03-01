@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4e'
+version = '0.5-pre4f'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -669,9 +669,10 @@ def main():
         tempcmd = ""
         if settings['showLogin'] == 'True':
             try:
-                tempcmd += f"{cc.dir}{os.getlogin()}{c.r} "
+                tempcmd += f"{cc.login}{os.getlogin()}@{socket.gethostname()}{c.r} "
             except Exception as e:
                 reportBadStart(e)
+                tempcmd += f"{cc.login}user@{socket.gethostname()}{c.r} "
 
         if settings['showDir'] == 'True':
             tempcmd += f"{cc.dir}{os.getcwd()}{c.r} "
