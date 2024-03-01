@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4c'
+version = '0.5-pre4d'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -134,7 +134,10 @@ def ping_ip(ip_address):
         return None
     
 # now time to load settings --settings
-settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
+try:
+    settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
+except:
+    settingsdir = '/home/user/.config/breadshell'
 settingspath = settingsdir+'/settings.ini'
 # read the settings and return all key/value pairs
 def read_settings():
