@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4f'
+version = '0.5-pre4g'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -187,6 +187,7 @@ for setting in defaultSettings:
         print(settings[setting])
     except:
         add_settings(setting,defaultSettings[setting])
+
 # clear console (2nd time)
 os.system('clear')
 
@@ -221,6 +222,10 @@ except:
     print(f'{c.red}breadshell is not installed, or an error has occured when loading{c.r}')
     installed = False
     runfrominstall = False
+
+# set version if installed
+if runfrominstall == True:
+    add_settings('h_version', version)
 
 # basic functions
     
@@ -795,7 +800,7 @@ def main():
 
             # display installation status
             if installed == True:
-                print(f'breadshell is {c.green}installed{c.r}')
+                print(f'breadshell is {c.green}installed{c.r} (version {c.cyan}{settings["h_version"]}{c.r})')
             else:
                 print(f'breadshell is {c.red}not installed{c.r}')
 
@@ -807,14 +812,15 @@ def main():
 
             print(f'made by {c.blue}wheatbread2056{c.r} on github')
 
-        # edit settings
+        # edit settings --editsettings
         elif cmd.startswith('settings'):
             if settings == {}:
                 throwerror(f'No settings were found, or there was an error reading settings.ini ({settingspath})')
                 main()
             else:
                 for key, value in settings.items():
-                    print(f"{key} - {c.cyan}{value}{c.r}")
+                    if not key.startswith('h_'):
+                        print(f"{key} - {c.cyan}{value}{c.r}")
 
             while True:
                 print('which setting would you like to change? (type exit to leave)')
