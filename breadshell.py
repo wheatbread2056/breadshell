@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5'
+version = '0.5a'
 versiontype = 1 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -511,9 +511,28 @@ def startu_python():
                 throwerror()
 
 def startu_networktest():
-    print(f'network tester v0.1')
-    rt = ping_ip('8.8.8.8')
-    print(f'{rt}ms')
+    print(f'network tester v0.3')
+    throwerror('This utility must be used as the superuser, or else it will fail.')
+    print('testing google ping (128x):')
+    initialms = 0
+    for i in range(128):
+        rt = ping_ip('8.8.8.8')
+        initialms+=int(rt)
+    print(f'{initialms/128}ms on 8.8.8.8')
+
+    initialms = 0
+    for i in range(128):
+        rt = ping_ip('8.8.4.4')
+        initialms+=int(rt)
+    print(f'{initialms/128}ms on 8.8.4.4')
+
+    print('testing cloudflare ping (128x):')
+
+    initialms = 0
+    for i in range(128):
+        rt = ping_ip('1.1.1.1')
+        initialms+=int(rt)
+    print(f'{initialms/128}ms on 1.1.1.1')
 
 def startu_assistant():
     '''
@@ -642,9 +661,9 @@ def utillauncher():
     # list amount of games here
     #------------------- NOTE: add 'networktest' utility when finished -------------
     utilities = ['colortester','calculator','python','assistant','networktest']
-    versions = ['1.1','1.1','1.0','0.1','INITIAL_VERSION']
+    versions = ['1.1','1.1','1.0','0.1','0.3']
 
-    print(f'bread utilities version {globalversion}')
+    print(f'bread utilities - {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
 
     i = 1
@@ -870,7 +889,7 @@ def main():
                     print('what would you like to type to activate the shortcut?')
                     newshortcutname = input(f'{c.cyan}new shortcut{c.r} {settings["pointerChar"]} ')
                     print('what command would you like to run for this shortcut?')
-                    newshortcutcmd = input(f'{c.cyan}newshortcutname{c.r} {settings["pointerChar"]} ')
+                    newshortcutcmd = input(f'{c.cyan}{newshortcutname}{c.r} {settings["pointerChar"]} ')
                     add_settings('s_'+newshortcutname,newshortcutcmd)
                 else:
                     throwerror('Invalid shortcut')
