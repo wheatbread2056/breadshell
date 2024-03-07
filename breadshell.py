@@ -54,7 +54,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5-pre4g'
+version = '0.5'
 versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
@@ -170,6 +170,14 @@ def add_settings(key, value):
     with open(settingspath, 'w') as file:
         for key, value in settings.items():
             file.write(f'{key}={value}\n')
+
+# remove a setting (broken idk why)
+def remove_settings(key1):
+    # write to the file
+    with open(settingspath, 'w') as file:
+        for key, value in settings.items():
+            if not key1 == key:
+                file.write(f'{key}={value}\n')
 
 # generate default settings
 defaultSettings = {
@@ -471,7 +479,7 @@ def startu_colortester():
 def startu_calculator():
     while True:
         # command (meant to be an expression)
-        cmd = input(f'{c.cyan}calculator{c.r} > ')
+        cmd = input(f'{c.cyan}calculator{c.r} {settings["pointerChar"]} ')
         if cmd == 'exit':
             utillauncher()
         # funny easter egg
@@ -492,7 +500,7 @@ def startu_calculator():
 def startu_python():
     while True:
         # command
-        cmd = input(f'{c.cyan}python{c.r} > ')
+        cmd = input(f'{c.cyan}python{c.r} {settings["pointerChar"]} ')
 
         if cmd == 'exit':
             utillauncher()
@@ -588,7 +596,7 @@ def startu_assistant():
     botmessage("hi! i'm iris, your personal assistant.")
     botmessage('how are you?')
     while True:
-        userinput = input(f'{c.cyan}assistant{c.r} > ')
+        userinput = input(f'{c.cyan}assistant{c.r} {settings["pointerChar"]} ')
         if userinput == 'exit':
             break
         elif userinput == '':
@@ -619,7 +627,7 @@ def games():
     
     print(f'{c.yellow}exit - exit')
 
-    game = input(f'{c.cyan}breadgames{c.r} > ')
+    game = input(f'{c.cyan}breadgames{c.r} {settings["pointerChar"]} ')
 
     if game == 'exit':
         main()
@@ -646,7 +654,7 @@ def utillauncher():
 
     print(f'{c.yellow}exit - exit')
 
-    utility = input(f'{c.cyan}breadutils{c.r} > ')
+    utility = input(f'{c.cyan}breadutils{c.r} {settings["pointerChar"]} ')
 
     if utility == 'exit':
         main()
@@ -708,15 +716,15 @@ def main():
     --- CUSTOM COMMANDS ---
 
     {c.yellow}bhelp{c.r} - open this page
-    {c.yellow}bfetch{c.r} - get system information (IN DEVELOPMENT)
+    {c.yellow}bfetch{c.r} - get system information (placeholder, coming in 1.0)
     {c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
     {c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
     {c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
     {c.yellow}bgames{c.r} - start game launcher
     {c.yellow}butils{c.r} - start utility launcher
     {c.yellow}version{c.r} - displays version information
-    {c.yellow}settings{c.r} - change your breadshell settings (IN DEVELOPMENT)
-    {c.yellow}scedit{c.r} - edit, modify, and create breadshell shortcuts (IN DEVELOPMENT)
+    {c.yellow}settings{c.r} - change your breadshell settings
+    {c.yellow}scedit{c.r} - edit, view, and create breadshell shortcuts
     {c.red}exit{c.r} - exits breadshell
     ''')
             
@@ -790,13 +798,13 @@ def main():
 
             # display version type
             if versiontype == 1:
-                print(f'this is a {c.green}release{c.r} build of breadshell')
+                print(f'this is a {c.green}release{c.r} of breadshell')
             elif versiontype == 2:
-                print(f'this is a {c.yellow}prerelease{c.r} build of breadshell')
+                print(f'this is a {c.yellow}prerelease{c.r} of breadshell')
             elif versiontype == 3:
-                print(f'this is a {c.magenta}development{c.r} build of breadshell')
+                print(f'this is a {c.magenta}development{c.r} of breadshell')
             else:
-                print(f'this is an {c.red}unknown{c.r} build of breadshell')
+                print(f'this is an {c.red}unknown{c.r} of breadshell')
 
             # display installation status
             if installed == True:
@@ -819,15 +827,15 @@ def main():
                 main()
             else:
                 for key, value in settings.items():
-                    if not key.startswith('h_'):
+                    if not key.startswith('h_') and not key.startswith('s_'):
                         print(f"{key} - {c.cyan}{value}{c.r}")
 
             while True:
                 print('which setting would you like to change? (type exit to leave)')
-                setting = input(f'{c.cyan}settings{c.r} > ')
+                setting = input(f'{c.cyan}settings{c.r} {settings["pointerChar"]} ')
                 if setting in settings:
                     print('Enter a new value:')
-                    newValue = input(f'{c.cyan}{setting}{c.r} > ')
+                    newValue = input(f'{c.cyan}{setting}{c.r} {settings["pointerChar"]} ')
                     if newValue.lower() == 'true':
                         add_settings(setting,True)
                     elif newValue.lower() == 'false':
@@ -839,10 +847,42 @@ def main():
                 else:
                     throwerror('Invalid setting')
 
+        # edit shortcuts (totally not just modified settings)
+        elif cmd.startswith('scedit'):
+            if settings == {}:
+                throwerror(f'No shortcuts were found, or there was an error reading settings.ini ({settingspath})')
+                main()
+            else:
+                for key, value in settings.items():
+                    if key.startswith('s_'):
+                        print(f"{key[2:]} - {c.cyan}{value}{c.r}")
+
+            while True:
+                print('which shortcut would you like to change? (type exit to leave, or type add to create a new shortcut)')
+                setting = input(f'{c.cyan}scedit{c.r} {settings["pointerChar"]} ')
+                if 's_'+setting in settings:
+                    print('Enter a new command for this shortcut:')
+                    newValue = input(f'{c.cyan}{setting}{c.r} {settings["pointerChar"]} ')
+                    add_settings('s_'+setting,newValue)
+                elif setting == 'exit':
+                    break
+                elif setting == 'add':
+                    print('what would you like to type to activate the shortcut?')
+                    newshortcutname = input(f'{c.cyan}new shortcut{c.r} {settings["pointerChar"]} ')
+                    print('what command would you like to run for this shortcut?')
+                    newshortcutcmd = input(f'{c.cyan}newshortcutname{c.r} {settings["pointerChar"]} ')
+                    add_settings('s_'+newshortcutname,newshortcutcmd)
+                else:
+                    throwerror('Invalid shortcut')
+
         elif cmd.startswith('kill yourself'):
             print('Ok, closing in 5 seconds...')
             time.sleep(5)
             exit()
+
+        # shortcuts (added in 0.5-pre4h)
+        elif 's_'+cmd in settings:
+            subprocess.run(['bash','-c',settings['s_'+cmd]]) 
 
         # if none of the above commands were selected, it will run this (run any command inside the input)
             
