@@ -16,12 +16,12 @@ update log + roadmap:
 
 - fix install.sh (done)
 
-**0.5 (in progress)**
+**0.5 (released)**
 
 - settings (done)
 - option to use breadshell as the default shell (done)
 - full customizability of colors, text, etc (done)
-- add "shortcuts"
+- add "shortcuts" (done)
 
 **1.0**
 

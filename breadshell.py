@@ -55,7 +55,7 @@ os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
 version = '0.5'
-versiontype = 2 # 1 = release, 2 = prerelease, 3 = development build
+versiontype = 1 # 1 = release, 2 = prerelease, 3 = development build
 
 # clear the console
 os.system('clear')
