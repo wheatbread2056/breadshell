@@ -54,8 +54,8 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '0.5a'
-versiontype = 1 # 1 = release, 2 = prerelease, 3 = development build
+version = '1.0-dev1'
+versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
 os.system('clear')
@@ -189,6 +189,7 @@ defaultSettings = {
     'showLogin': 'True',
     'showDir': 'True',
     'showPointer': 'True',
+    'dirType': '0'
 }
 for setting in defaultSettings:
     try:
@@ -819,9 +820,11 @@ def main():
             if versiontype == 1:
                 print(f'this is a {c.green}release{c.r} of breadshell')
             elif versiontype == 2:
-                print(f'this is a {c.yellow}prerelease{c.r} of breadshell')
+                print(f'this is a {c.yellow}prerelease{c.r} of breadshell. \nsome bugs may occur')
             elif versiontype == 3:
-                print(f'this is a {c.magenta}development{c.r} of breadshell')
+                print(f'this is a {c.magenta}development build{c.r} of breadshell. \nsome bugs or unfinished features may occur')
+            elif versiontype == 4:
+                print(f'this is an {c.cyan}early development build{c.r} of breadshell. \nmany bugs or unfinished features may occur')
             else:
                 print(f'this is an {c.red}unknown{c.r} of breadshell')
 
