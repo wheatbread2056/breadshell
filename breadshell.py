@@ -1,3 +1,5 @@
+# breadshell development build
+
 # IMPORT ALL DEPENDENCIES --initial
 
 # built-in libraries
@@ -50,11 +52,22 @@ except:
     except:
         print('FAILED TO INSTALL, DEFAULTING TO APT AS PACKAGE MANAGER')
 
+# import prompt_tooklit - used for autocompletion
+try:
+    import prompt_tooklit
+except:
+    try:
+        print('prompt_toolkit not installed, installing now')
+        os.system('pip install prompt_toolkit --break-system-packages')
+        import distro
+    except:
+        print('FAILED TO INSTALL, THERE WILL BE NO AUTOCOMPLETION')
+
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev1'
+version = '1.0-dev1a'
 versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -145,11 +158,11 @@ def read_settings():
     # create the file if it doesn't already exist
     try:
         with open(settingspath, 'a') as file:
-            pass
+            file.close()
     except:
         os.mkdir(settingsdir)
         with open(settingspath, 'a') as file:
-            pass
+            file.close()
     
     with open(settingspath, 'r') as file:
         for line in file:
@@ -159,6 +172,7 @@ def read_settings():
                 # remove quotes
                 value = value.strip('"').strip("'")
                 config[key] = value
+    file.close()
     return config
 
 settings = read_settings()
@@ -243,9 +257,10 @@ def throwerror(msg='An unknown error has occured'):
     print(f'{c.yellow}{msg}{c.r}')
 
 # returns red error and exits to prevent corruption or something
-def fatalerror(msg='A fatal error has occured, exiting immediately'):
+def fatalerror(msg='A fatal error has occured, exiting immediately',force_exit=1):
     print(f'{c.red}{msg}{c.r}')
-    exit()
+    if force_exit == 1:
+        exit()
 
 # game scripts --games
     
@@ -632,7 +647,7 @@ def startu_assistant():
 
 # game launcher
 def games():
-    globalversion = '0.3'
+    globalversion = '0.3.1'
     # list amount of games here
     games = ['rpg_test']
     versions = ['0.2']
@@ -647,24 +662,31 @@ def games():
     
     print(f'{c.yellow}exit - exit')
 
-    game = input(f'{c.cyan}breadgames{c.r} {settings["pointerChar"]} ')
+    # fixes crashing bug (major) - added in 1.0-dev1a
+    def selection(games):
+        game = input(f'{c.cyan}bgames{c.r} {settings["pointerChar"]} ')
 
-    if game == 'exit':
-        main()
-    if games[int(game)-1] in games:
-        print(f'Loading {games[int(game)-1]}...')
-        exec(f'startg_{games[int(game)-1]}()')
+        if game == 'exit':
+            main()
+        try:
+            if games[int(game)-1] in games:
+                print(f'Loading {games[int(game)-1]}...')
+                exec(f'startg_{games[int(game)-1]}()')
+        except:
+            throwerror('Invalid game.')
+            selection(games)
+    selection(games)
 
 # utility launcher (totally not just modified game launcher)
 
 def utillauncher():
-    globalversion = '0.3'
+    globalversion = '0.3.1'
     # list amount of games here
     #------------------- NOTE: add 'networktest' utility when finished -------------
     utilities = ['colortester','calculator','python','assistant','networktest']
     versions = ['1.1','1.1','1.0','0.1','0.3']
 
-    print(f'bread utilities - {globalversion}')
+    print(f'breadshell utilities {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
 
     i = 1
@@ -674,20 +696,27 @@ def utillauncher():
 
     print(f'{c.yellow}exit - exit')
 
-    utility = input(f'{c.cyan}breadutils{c.r} {settings["pointerChar"]} ')
+    # fixes crashing bug (major) - added in 1.0-dev1a
+    def selection(utilities):
+        utility = input(f'{c.cyan}butils{c.r} {settings["pointerChar"]} ')
 
-    if utility == 'exit':
-        main()
-    if utilities[int(utility)-1] in utilities:
-        print(f'Loading {utilities[int(utility)-1]}...')
-        exec(f'startu_{utilities[int(utility)-1]}()')
+        if utility == 'exit':
+            main()
+        try:
+            if utilities[int(utility)-1] in utilities:
+                print(f'Loading {utilities[int(utility)-1]}...')
+                exec(f'startu_{utilities[int(utility)-1]}()')
+        except:
+            throwerror('Invalid utility.')
+            selection(utilities)
+    selection(utilities)
 
 badStart = False
 
 def reportBadStart(a):
     global badStart
     if not badStart:
-        print(f'{c.red}{a}{c.r}')
+        print(f'{c.red}an error occurred: {a}{c.r}')
         print(f'{c.red}username will not be loaded to fix compatibility issues{c.r}')
         badStart = True
 
