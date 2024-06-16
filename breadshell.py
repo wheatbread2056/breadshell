@@ -77,7 +77,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev1c'
+version = '1.0-dev1d'
 versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -875,7 +875,10 @@ def main():
         # actually useful, directly execute code from breadshell.py
         # able to execute multiple commands at a time without semicolon seperators
         elif cmd.startswith('dev-exec'):
-            exec(' '.join(cmdargs[1:]))
+            try:
+                exec(' '.join(cmdargs[1:]))
+            except Exception as e:
+                throwerror('(Python) '+str(e))
 
         elif cmd.startswith('dev-text-effects-demo'):
             print(f'''
