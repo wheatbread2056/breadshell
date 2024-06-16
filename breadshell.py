@@ -67,7 +67,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev1a'
+version = '1.0-dev1b'
 versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -140,7 +140,7 @@ def ping_ip(ip_address):
             responseTime = float(timeMatch.group(1))
             return responseTime
         else:
-            return None
+            return 0
         
     except subprocess.CalledProcessError:
         # Handle if the ping command fails
@@ -172,7 +172,7 @@ def read_settings():
                 # remove quotes
                 value = value.strip('"').strip("'")
                 config[key] = value
-    file.close()
+        file.close()
     return config
 
 settings = read_settings()
@@ -184,6 +184,7 @@ def add_settings(key, value):
     with open(settingspath, 'w') as file:
         for key, value in settings.items():
             file.write(f'{key}={value}\n')
+        file.close()
 
 # remove a setting (broken idk why)
 def remove_settings(key1):
@@ -192,6 +193,7 @@ def remove_settings(key1):
         for key, value in settings.items():
             if not key1 == key:
                 file.write(f'{key}={value}\n')
+        file.close()
 
 # generate default settings
 defaultSettings = {
@@ -633,7 +635,7 @@ def startu_assistant():
     while True:
         userinput = input(f'{c.cyan}assistant{c.r} {settings["pointerChar"]} ')
         if userinput == 'exit':
-            break
+            utillauncher()
         elif userinput == '':
             botmessage(blankerrors[random.randint(0,len(blankerrors)-1)])
         else:
@@ -680,11 +682,11 @@ def games():
 # utility launcher (totally not just modified game launcher)
 
 def utillauncher():
-    globalversion = '0.3.1'
+    globalversion = '0.3.2'
     # list amount of games here
     #------------------- NOTE: add 'networktest' utility when finished -------------
     utilities = ['colortester','calculator','python','assistant','networktest']
-    versions = ['1.1','1.1','1.0','0.1','0.3']
+    versions = ['1.1','1.1','1.0','0.1.1','0.3']
 
     print(f'breadshell utilities {globalversion}')
     print(f'please select the utility you would like to start ({len(utilities)} found):')
@@ -696,19 +698,27 @@ def utillauncher():
 
     print(f'{c.yellow}exit - exit')
 
-    # fixes crashing bug (major) - added in 1.0-dev1a
+    # fixes crashing bug (major) - added in 1.0-dev1a, fixed in 1.0-dev1b (another minor bug appeared)
     def selection(utilities):
-        utility = input(f'{c.cyan}butils{c.r} {settings["pointerChar"]} ')
-
-        if utility == 'exit':
-            main()
         try:
-            if utilities[int(utility)-1] in utilities:
-                print(f'Loading {utilities[int(utility)-1]}...')
-                exec(f'startu_{utilities[int(utility)-1]}()')
+            utility = input(f'{c.cyan}butils{c.r} {settings["pointerChar"]} ')
         except:
-            throwerror('Invalid utility.')
-            selection(utilities)
+            pass
+        try:
+            if utility == 'exit':
+                main()
+            else:
+                try:
+                    if utilities[int(utility)-1] in utilities:
+                        print(f'Starting {utilities[int(utility)-1]}...')
+                        exec(f'startu_{utilities[int(utility)-1]}()')
+                except:
+                    if utility == None or utility == '' or utility.lower == 'exit':
+                        pass
+                    else:
+                        throwerror('Invalid utility.')
+        except:
+            pass
     selection(utilities)
 
 badStart = False
@@ -745,7 +755,11 @@ def main():
         tempcmd += cc.text
 
         # main input (user@hostname path/to/directory > command typed in) --main
-        cmd = input(tempcmd)
+        try:
+            cmd = input(tempcmd)
+        except Exception as e:
+            fatalerror('An error has occured: '+str(e))
+        
         print(c.r,end='')
 
         # for special commands
@@ -833,6 +847,15 @@ def main():
             for i in range(1024):
                 startu_colortester()
 
+        # actually useful, directly execute code from breadshell.py
+        # able to execute multiple commands at a time without semicolon seperators
+        elif cmd.startswith('dev-exec'):
+            cmdargs = cmd.split(' ')
+            for a in cmdargs[1:]:
+                try:
+                    exec(a)
+                except Exception as e:
+                    throwerror('(Python) '+str(e))
         # launch games
         elif cmd.startswith('bgames'):
             games()
@@ -855,7 +878,7 @@ def main():
             elif versiontype == 4:
                 print(f'this is an {c.cyan}early development build{c.r} of breadshell. \nmany bugs or unfinished features may occur')
             else:
-                print(f'this is an {c.red}unknown{c.r} of breadshell')
+                print(f'this is an {c.red}unknown{c.r} version of breadshell')
 
             # display installation status
             if installed == True:
