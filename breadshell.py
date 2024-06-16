@@ -1,5 +1,15 @@
 # breadshell development build
 
+# detect if running on wsl
+try:
+    with open('/proc/version', 'r') as f:
+        if 'microsoft' in f.read().lower() or 'wsl' in f.read().lower():
+            WSL = True
+        else:
+            WSL = False
+except:
+    WSL = False
+
 # IMPORT ALL DEPENDENCIES --initial
 
 # built-in libraries
@@ -67,7 +77,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev1b'
+version = '1.0-dev1c'
 versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -109,6 +119,10 @@ else:
         cyan = colorama.Fore.CYAN
         white = colorama.Fore.WHITE
         black = colorama.Fore.BLACK
+        b = '\033[1m' # bold
+        i = '\033[3m' # italic
+        u = '\033[4m' # underline
+        e = '\033[0m' # end
         r = colorama.Fore.RESET # resets color to default
 
     # background colors
@@ -140,7 +154,7 @@ def ping_ip(ip_address):
             responseTime = float(timeMatch.group(1))
             return responseTime
         else:
-            return 0
+            return None
         
     except subprocess.CalledProcessError:
         # Handle if the ping command fails
@@ -530,27 +544,33 @@ def startu_python():
 
 def startu_networktest():
     print(f'network tester v0.3')
-    throwerror('This utility must be used as the superuser, or else it will fail.')
-    print('testing google ping (128x):')
-    initialms = 0
-    for i in range(128):
-        rt = ping_ip('8.8.8.8')
-        initialms+=int(rt)
-    print(f'{initialms/128}ms on 8.8.8.8')
+    disabled = 0
+    if ping_ip('8.8.8.8') == None:
+        throwerror('Run this utility as the superuser and try again.')
+        disabled = 1
+    if disabled == 0:
+        print('How many pings per IP?')
+        pcount = int(input('> '))
+        print(f'testing google ping ({pcount}+{pcount}x):')
+        initialms = 0
+        for i in range(pcount):
+            rt = ping_ip('8.8.8.8')
+            initialms+=int(rt)
+        print(f'{round(initialms/pcount,2)}ms on 8.8.8.8')
 
-    initialms = 0
-    for i in range(128):
-        rt = ping_ip('8.8.4.4')
-        initialms+=int(rt)
-    print(f'{initialms/128}ms on 8.8.4.4')
+        initialms = 0
+        for i in range(pcount):
+            rt = ping_ip('8.8.4.4')
+            initialms+=int(rt)
+        print(f'{round(initialms/pcount,2)}ms on 8.8.4.4')
 
-    print('testing cloudflare ping (128x):')
+        print(f'testing cloudflare ping ({pcount}x):')
 
-    initialms = 0
-    for i in range(128):
-        rt = ping_ip('1.1.1.1')
-        initialms+=int(rt)
-    print(f'{initialms/128}ms on 1.1.1.1')
+        initialms = 0
+        for i in range(pcount):
+            rt = ping_ip('1.1.1.1')
+            initialms+=int(rt)
+        print(f'{round(initialms/pcount,2)}ms on 1.1.1.1')
 
 def startu_assistant():
     '''
@@ -726,9 +746,12 @@ badStart = False
 def reportBadStart(a):
     global badStart
     if not badStart:
-        print(f'{c.red}an error occurred: {a}{c.r}')
-        print(f'{c.red}username will not be loaded to fix compatibility issues{c.r}')
+        throwerror(f'an error occurred: {a}')
+        throwerror('username will default to \'user\' to fix compatibility issues')
         badStart = True
+
+if WSL == 1:
+    throwerror('Note: Bold and italic text effects are not supported when using the Windows Terminal. Use real Linux or an X Server when possible.')
 
 # start of program, shown when opening the file
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
@@ -761,6 +784,8 @@ def main():
             fatalerror('An error has occured: '+str(e))
         
         print(c.r,end='')
+
+        cmdargs = cmd.split(' ') # get command arguments
 
         # for special commands
             
@@ -850,12 +875,15 @@ def main():
         # actually useful, directly execute code from breadshell.py
         # able to execute multiple commands at a time without semicolon seperators
         elif cmd.startswith('dev-exec'):
-            cmdargs = cmd.split(' ')
-            for a in cmdargs[1:]:
-                try:
-                    exec(a)
-                except Exception as e:
-                    throwerror('(Python) '+str(e))
+            exec(' '.join(cmdargs[1:]))
+
+        elif cmd.startswith('dev-text-effects-demo'):
+            print(f'''
+{c.b}this text should be bold{c.e} and this text is normal
+{c.i}this should be italic{c.e}
+{c.u}this should be underlined{c.e}
+''')
+
         # launch games
         elif cmd.startswith('bgames'):
             games()
