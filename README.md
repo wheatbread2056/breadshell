@@ -23,17 +23,4 @@ update log + roadmap:
 - full customizability of colors, text, etc (done)
 - add "shortcuts" (done)
 
-**1.0**
-
-- add bfetch
-- add light mode
-- fix incompatibility with konsole
-- autocompletion
-- add support for pacman and other package managers
-
-**1.1**
-
-- add custom games
-- add autocomplete similar to fish
-- add an actual calculator instead of a slightly modified version of the python utility
-- add plugin support
+1.0 is planned to release on July 25th, 2024
