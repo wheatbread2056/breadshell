@@ -926,7 +926,7 @@ def main():
             else:
                 print(f'running from {c.red}file{c.r}')
 
-            print(f'made by {c.blue}wheatbread2056{c.r} on github')
+            print(f'source code on {c.blue}github.com/wheatbread2056/breadshell{c.r}')
 
         # edit settings --editsettings
         elif cmd.startswith('settings'):
