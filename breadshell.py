@@ -22,6 +22,7 @@ import base64
 import datetime
 import random
 import subprocess
+import getpass
 import socket
 import re
 
@@ -69,7 +70,7 @@ except:
     try:
         print('prompt_toolkit not installed, installing now')
         os.system('pip install prompt_toolkit --break-system-packages')
-        import distro
+        import prompt_toolkit
     except:
         print('FAILED TO INSTALL, THERE WILL BE NO AUTOCOMPLETION')
 
@@ -77,8 +78,8 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev1d'
-versiontype = 4 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
+version = '1.0-dev2'
+versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
 os.system('clear')
@@ -160,9 +161,11 @@ def ping_ip(ip_address):
         # Handle if the ping command fails
         return None
     
+user = getpass.getuser()
+    
 # now time to load settings --settings
 try:
-    settingsdir = f'/home/{os.getlogin()}/.config/breadshell'
+    settingsdir = f'/home/{user}/.config/breadshell'
 except:
     settingsdir = '/home/user/.config/breadshell'
 settingspath = settingsdir+'/settings.ini'
@@ -764,7 +767,7 @@ def main():
         tempcmd = ""
         if settings['showLogin'] == 'True':
             try:
-                tempcmd += f"{cc.login}{os.getlogin()}@{socket.gethostname()}{c.r} "
+                tempcmd += f"{cc.login}{user}@{socket.gethostname()}{c.r} "
             except Exception as e:
                 reportBadStart(e)
                 tempcmd += f"{cc.login}user@{socket.gethostname()}{c.r} "
