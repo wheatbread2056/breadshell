@@ -29,6 +29,7 @@ import re
 # the point of this code is to install the modules if the user doesn't already have them installed
 
 DISABLE_COLORS = False
+DEFAULT_SETTINGS = False
 # import colorama
 try:
     import colorama
@@ -78,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2a'
+version = '1.0-dev2b'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -171,46 +172,56 @@ except:
 settingspath = settingsdir+'/settings.ini'
 # read the settings and return all key/value pairs
 def read_settings():
+    global DEFAULT_SETTINGS
     config = {}
     # create the file if it doesn't already exist
     try:
         with open(settingspath, 'a') as file:
             file.close()
     except:
-        os.mkdir(settingsdir)
-        with open(settingspath, 'a') as file:
+        try:
+            os.mkdir(settingsdir)
+        except:
+            DEFAULT_SETTINGS = True
+        try:
+            with open(settingspath, 'a') as file:
+                file.close()
+        except:
+            DEFAULT_SETTINGS = True
+    if DEFAULT_SETTINGS == False:
+        with open(settingspath, 'r') as file:
+            for line in file:
+                # skip empty lines and comment lines
+                if line.strip() and not line.startswith('#'):
+                    key, value = line.strip().split('=',1)
+                    # remove quotes
+                    value = value.strip('"').strip("'")
+                    config[key] = value
             file.close()
-    
-    with open(settingspath, 'r') as file:
-        for line in file:
-            # skip empty lines and comment lines
-            if line.strip() and not line.startswith('#'):
-                key, value = line.strip().split('=',1)
-                # remove quotes
-                value = value.strip('"').strip("'")
-                config[key] = value
-        file.close()
-    return config
+        return config
 
-settings = read_settings()
+if DEFAULT_SETTINGS == False:
+    settings = read_settings()
 
 # overwrite the settings and add new values
 def add_settings(key, value):
     settings[key] = value
     # write to the file
-    with open(settingspath, 'w') as file:
-        for key, value in settings.items():
-            file.write(f'{key}={value}\n')
-        file.close()
+    if DEFAULT_SETTINGS == False:
+        with open(settingspath, 'w') as file:
+            for key, value in settings.items():
+                file.write(f'{key}={value}\n')
+            file.close()
 
 # remove a setting (broken idk why)
 def remove_settings(key1):
     # write to the file
-    with open(settingspath, 'w') as file:
-        for key, value in settings.items():
-            if not key1 == key:
-                file.write(f'{key}={value}\n')
-        file.close()
+    if DEFAULT_SETTINGS == False:
+        with open(settingspath, 'w') as file:
+            for key, value in settings.items():
+                if not key1 == key:
+                    file.write(f'{key}={value}\n')
+            file.close()
 
 # generate default settings
 defaultSettings = {
@@ -224,11 +235,14 @@ defaultSettings = {
     'showPointer': 'True',
     'dirType': '0'
 }
-for setting in defaultSettings:
-    try:
-        print(settings[setting])
-    except:
-        add_settings(setting,defaultSettings[setting])
+if DEFAULT_SETTINGS == False:
+    for setting in defaultSettings:
+        try:
+            print(settings[setting])
+        except:
+            add_settings(setting,defaultSettings[setting])
+else:
+    settings = defaultSettings.copy()
 
 # clear console (2nd time)
 os.system('clear')
@@ -755,6 +769,9 @@ def reportBadStart(a):
 
 if WSL == 1:
     throwerror('Note: Bold and italic text effects are not supported when using the Windows Terminal. Use real Linux or an X Server when possible.')
+
+if DEFAULT_SETTINGS == True:
+    throwerror(f'{settingspath.replace(f"/home/{user}", "~")} couldn\'t be generated, default settings will be used. Settings will not save.')
 
 # start of program, shown when opening the file
 print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
