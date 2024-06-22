@@ -78,7 +78,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2'
+version = '1.0-dev2a'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -773,7 +773,7 @@ def main():
                 tempcmd += f"{cc.login}user@{socket.gethostname()}{c.r} "
 
         if settings['showDir'] == 'True':
-            tempcmd += f"{cc.dir}{os.getcwd()}{c.r} "
+            tempcmd += f"{cc.dir}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
 
         if settings['showPointer'] == 'True':
             tempcmd += f"{cc.pointer}{settings['pointerChar']} {c.r}"
@@ -786,7 +786,7 @@ def main():
         except Exception as e:
             fatalerror('An error has occured: '+str(e))
         
-        print(c.r,end='')
+        print(c.r + c.e,end='') # attempt to stop command output from using the set text color (doesn't work)
 
         cmdargs = cmd.split(' ') # get command arguments
 
@@ -953,6 +953,7 @@ def main():
                 elif setting == 'exit':
                     break
                 else:
+      
                     throwerror('Invalid setting')
 
         # edit shortcuts (totally not just modified settings)
@@ -997,8 +998,8 @@ def main():
         else:
             try:
                 subprocess.run(['bash','-c',cmd])
-            except:
-                fatalerror()
+            except Exception as e:
+                fatalerror('An error has occured: '+e)
             
 # run main function (moved from while loop to function in 0.3 so the user can be returned back to the shell in case anything goes wrong)
 main()
