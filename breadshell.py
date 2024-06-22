@@ -79,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2b'
+version = '1.0-dev2c'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -933,7 +933,10 @@ def main():
 
             # display installation status
             if installed == True:
-                print(f'breadshell is {c.green}installed{c.r} (version {c.cyan}{settings["h_version"]}{c.r})')
+                if DEFAULT_SETTINGS == False:
+                    print(f'breadshell is {c.green}installed{c.r} (version {c.cyan}{settings["h_version"]}{c.r})')
+                else:
+                    print(f'breadshell is {c.green}installed{c.r} (version {c.red}unknown{c.r})')
             else:
                 print(f'breadshell is {c.red}not installed{c.r}')
 
