@@ -79,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2c'
+version = '1.0-dev2d'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -145,6 +145,8 @@ class cc:
     dir = c.green
     text = c.r
     pointer = c.r
+
+colorama.init(autoreset=True) # fix weird command output color bug idk
 
 # used for networktest utility
 def ping_ip(ip_address):
