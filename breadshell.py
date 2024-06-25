@@ -79,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2d'
+version = '1.0-dev2e'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -805,21 +805,20 @@ def main():
         except Exception as e:
             fatalerror('An error has occured: '+str(e))
         
-        print(c.r + c.e,end='') # attempt to stop command output from using the set text color (doesn't work)
-
+        print(c.r + c.e,end='') # attempt to stop command output from using the set text color
         cmdargs = cmd.split(' ') # get command arguments
 
         # for special commands
             
         # change directory (cd)
-        if cmd.startswith('cd'):
+        if cmdargs[0] == ('cd'):
             try:
                 os.chdir(cmd.split(' ')[1])
             except:
                 throwerror('Invalid directory, or a directory was not specified')
 
         # breadhelp (bhelp)
-        elif cmd.startswith('bhelp'):
+        elif cmdargs[0] == ('bhelp'):
             print(f'''
     breadshell version {c.cyan}{version}{c.r}
 
@@ -839,70 +838,70 @@ def main():
     ''')
             
         # breadfetch (bfetch)
-        elif cmd.startswith('bfetch'):
+        elif cmdargs[0] == ('bfetch'):
             print('making this later, for now just have neofetch')
             subprocess.run(['bash','-c','neofetch'])
 
         # breadinstall (inst)
-        elif cmd.startswith('inst'):
+        elif cmdargs[0] == ('inst'):
             try:
                 subprocess.run(['bash','-c',f'sudo apt install {cmd.split(" ")[1]} -y'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
         # breaduninstall (uninst)
-        elif cmd.startswith('uninst'):
+        elif cmdargs[0] == ('uninst'):
             try:
                 subprocess.run(['bash','-c',f'sudo apt remove {cmd.split(" ")[1]} -y'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
         # breadpackages (bpkgs)
-        elif cmd.startswith('bpkgs'):
+        elif cmdargs[0] == ('bpkgs'):
             try:
                 subprocess.run(['bash','-c',f'apt search {cmd.split(" ")[1]}'])
             except:
                 throwerror('Invalid package name, or a package was not specfied')
 
         # exit... self explanatory
-        elif cmd.startswith('exit'):
+        elif cmdargs[0] == ('exit'):
             exit()
 
         # "developer commands"
             
         # throw a generic error
-        elif cmd.startswith('dev-generic-error'):
+        elif cmdargs[0] == ('dev-generic-error'):
             throwerror()
             
         # throw a FATAL generic error, which is red...
-        elif cmd.startswith('dev-generic-fatalerror'):
+        elif cmdargs[0] == ('dev-generic-fatalerror'):
             fatalerror()
 
         # set background color to a random color
-        elif cmd.startswith('dev-randombg'):
+        elif cmdargs[0] == ('dev-randombg'):
             quickColors = [bc.red,bc.yellow,bc.green,bc.blue,bc.magenta]
             print(quickColors[random.randint(0,len(quickColors)-1)])
             os.system('clear')
         
         # reset the background color
-        elif cmd.startswith('dev-resetbg'):
+        elif cmdargs[0] == ('dev-resetbg'):
             print(bc.r)
             os.system('clear')
         
         # colortest 1024 times... for some reason
-        elif cmd.startswith('dev-explosionofcolors'):
+        elif cmdargs[0] == ('dev-explosionofcolors'):
             for i in range(1024):
                 startu_colortester()
 
         # actually useful, directly execute code from breadshell.py
         # able to execute multiple commands at a time without semicolon seperators
-        elif cmd.startswith('dev-exec'):
+        elif cmdargs[0] == ('dev-exec'):
             try:
                 exec(' '.join(cmdargs[1:]))
             except Exception as e:
                 throwerror('(Python) '+str(e))
 
-        elif cmd.startswith('dev-text-effects-demo'):
+        elif cmdargs[0] == ('dev-text-effects-demo'):
             print(f'''
 {c.b}this text should be bold{c.e} and this text is normal
 {c.i}this should be italic{c.e}
@@ -910,15 +909,15 @@ def main():
 ''')
 
         # launch games
-        elif cmd.startswith('bgames'):
+        elif cmdargs[0] == ('bgames'):
             games()
 
         # launch utilities
-        elif cmd.startswith('butils'):
+        elif cmdargs[0] == ('butils'):
             utillauncher()
 
         # display version info
-        elif cmd.startswith('version'):
+        elif cmdargs[0] == ('version'):
             print(f'breadshell version {c.cyan}{version}{c.r}')
 
             # display version type
@@ -951,7 +950,7 @@ def main():
             print(f'source code on {c.blue}github.com/wheatbread2056/breadshell{c.r}')
 
         # edit settings --editsettings
-        elif cmd.startswith('settings'):
+        elif cmdargs[0] == ('settings'):
             if settings == {}:
                 throwerror(f'No settings were found, or there was an error reading settings.ini ({settingspath})')
                 main()
@@ -979,7 +978,7 @@ def main():
                     throwerror('Invalid setting')
 
         # edit shortcuts (totally not just modified settings)
-        elif cmd.startswith('scedit'):
+        elif cmdargs[0] == ('scedit'):
             if settings == {}:
                 throwerror(f'No shortcuts were found, or there was an error reading settings.ini ({settingspath})')
                 main()
@@ -1006,7 +1005,7 @@ def main():
                 else:
                     throwerror('Invalid shortcut')
 
-        elif cmd.startswith('kill yourself'):
+        elif cmdargs[0] == ('kill yourself'):
             print('Ok, closing in 5 seconds...')
             time.sleep(5)
             exit()
