@@ -79,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev3'
+version = '1.0-dev3a'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -830,7 +830,6 @@ def main():
     --- CUSTOM COMMANDS ---
 
     {c.yellow}bhelp{c.r} - open this page
-    {c.yellow}bfetch{c.r} - get system information (placeholder, coming in 1.0)
     {c.yellow}inst{c.r} {c.cyan}<package-name>{c.r} - easy way to install packages
     {c.yellow}uninst{c.r} {c.cyan}<package-name>{c.r} - easy way to uninstall packages
     {c.yellow}bpkgs{c.r} {c.cyan}<query>{c.r} - search packages
@@ -964,10 +963,11 @@ def main():
                     if not key.startswith('h_') and not key.startswith('s_'):
                         print(f"{key} - {c.cyan}{value}{c.r}")
 
+            print('Type the name of the setting you would like to change, or list to list settings, or exit to leave')
+
             while True:
-                print('which setting would you like to change? (type exit to leave)')
                 setting = input(f'{c.cyan}settings{c.r} {settings["pointerChar"]} ')
-                if setting in settings:
+                if setting in settings and not setting.startswith('h_') and not settings.startswith('s_'):
                     print('Enter a new value:')
                     newValue = input(f'{c.cyan}{setting}{c.r} {settings["pointerChar"]} ')
                     if newValue.lower() == 'true':
@@ -976,7 +976,17 @@ def main():
                         add_settings(setting,False)
                     else:
                         add_settings(setting,newValue)
-                elif setting == 'exit':
+                elif setting.lower() == 'list':
+                    for key, value in settings.items():
+                        if not key.startswith('h_') and not key.startswith('s_'):
+                            print(f"{key} - {c.cyan}{value}{c.r}")
+                elif setting.lower() == 'dev-list':
+                    for key, value in settings.items():
+                        if not key.startswith('h_') and not key.startswith('s_'):
+                            print(f"{key} - {c.cyan}{value}{c.r}")
+                        else:
+                            print(f"{c.red}{key}{c.r} - {c.cyan}{value}{c.r}")
+                elif setting.lower() == 'exit':
                     break
                 else:
       
