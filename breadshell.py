@@ -79,7 +79,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev2e'
+version = '1.0-dev3'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
 
 # clear the console
@@ -235,7 +235,8 @@ defaultSettings = {
     'showLogin': 'True',
     'showDir': 'True',
     'showPointer': 'True',
-    'dirType': '0'
+    'showHost': 'True',
+    'dirType': '0',
 }
 if DEFAULT_SETTINGS == False:
     for setting in defaultSettings:
@@ -762,7 +763,7 @@ def utillauncher():
 
 badStart = False
 
-def reportBadStart(a):
+def reportBadStart(a): # legacy fix introduced around 0.4 to prevent wsl from instantly crashing
     global badStart
     if not badStart:
         throwerror(f'an error occurred: {a}')
@@ -787,9 +788,13 @@ def main():
         if settings['showLogin'] == 'True':
             try:
                 tempcmd += f"{cc.login}{user}@{socket.gethostname()}{c.r} "
+                if not settings['showHost'] == 'True':
+                    tempcmd = tempcmd.split('@')[0]+f'{c.r} '
             except Exception as e:
                 reportBadStart(e)
                 tempcmd += f"{cc.login}user@{socket.gethostname()}{c.r} "
+                if not settings['showHost'] == 'True':
+                    tempcmd = tempcmd.split('@')[0]+f'{c.r} '
 
         if settings['showDir'] == 'True':
             tempcmd += f"{cc.dir}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
