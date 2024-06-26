@@ -79,9 +79,9 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev4'
-versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
+version = '1.0-dev4a'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
+versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
 
 # clear the console
@@ -799,8 +799,8 @@ if not versiontext == '' and not versiontext == None:
 else:
     vt = ''
 
-print(f'Version {c.cyan}{version}{c.r}{vt}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
-print(f'Type {c.yellow}bhelp{c.r} for a list of custom commands.')
+print(f'version {c.cyan}{version}{c.r}{vt}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
+print(f'type {c.yellow}bhelp{c.r} for a list of custom commands.')
 # main loop
 def main():
     while True:
@@ -1112,23 +1112,41 @@ def main():
                     if key.startswith('s_'):
                         print(f"{key[2:]} - {c.cyan}{value}{c.r}")
 
+            print('which shortcut would you like to change? alternatively, you can type exit, list, remove, or add.')
+            
             while True:
-                print('which shortcut would you like to change? (type exit to leave, or type add to create a new shortcut)')
                 setting = input(f'{c.cyan}scedit{c.r} {settings["pointerChar"]} ')
+                
                 if 's_'+setting in settings:
                     print('Enter a new command for this shortcut:')
                     newValue = input(f'{c.cyan}{setting}{c.r} {settings["pointerChar"]} ')
                     add_settings('s_'+setting,newValue)
+
                 elif setting == 'exit':
                     break
+
                 elif setting == 'add':
                     print('what would you like to type to activate the shortcut?')
                     newshortcutname = input(f'{c.cyan}new shortcut{c.r} {settings["pointerChar"]} ')
                     print('what command would you like to run for this shortcut?')
                     newshortcutcmd = input(f'{c.cyan}{newshortcutname}{c.r} {settings["pointerChar"]} ')
                     add_settings('s_'+newshortcutname,newshortcutcmd)
+
+                elif setting == 'remove':
+                    print('which shortcut would you like to remove?')
+                    delshortcut = input(f'{c.cyan}scedit{c.r} {settings["pointerChar"]} ')
+                    if 's_'+delshortcut in settings:
+                        remove_settings('s_'+delshortcut)
+                    else:
+                        throwerror('Invalid shortcut.')
+
+                elif setting == 'list':
+                    for key, value in settings.items():
+                        if key.startswith('s_'):
+                            print(f"{key[2:]} - {c.cyan}{value}{c.r}")
+
                 else:
-                    throwerror('Invalid shortcut')
+                    throwerror('Invalid shortcut.')
 
         elif cmdargs[0] == ('kill yourself'):
             print('Ok, closing in 5 seconds...')
