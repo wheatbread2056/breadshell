@@ -79,8 +79,10 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev3a'
-versiontype = 3 # 1 = release, 2 = prerelease, 3 = development build, 4 = early developent build
+version = '1.0-dev4'
+versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
+versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
+devnote = ''
 
 # clear the console
 os.system('clear')
@@ -246,6 +248,21 @@ if DEFAULT_SETTINGS == False:
             add_settings(setting,defaultSettings[setting])
 else:
     settings = defaultSettings.copy()
+
+# settings friendly names
+friendlySettings = {
+    'loginColor': 'Username Color',
+    'dirColor': 'Directory Color',
+    'textColor': 'Text Color',
+    'pointerColor': 'Pointer Color',
+    'pointerChar': 'Pointer Character',
+    'showLogin': 'Show Current User',
+    'showDir': 'Show Current Directory',
+    'showPointer': 'Show Pointer',
+    'showHost': 'Show Hostname',
+    'dirType': 'not implemented', # add this later
+    'h_version': 'Installed Version',
+}
 
 # clear console (2nd time)
 os.system('clear')
@@ -694,7 +711,7 @@ def games():
     games = ['rpg_test']
     versions = ['0.2']
 
-    print(f'bread games version {globalversion}')
+    print(f'breadshell game launcher version {globalversion}')
     print(f'please select the game you would like to start ({len(games)} found):')
 
     i = 1
@@ -777,8 +794,13 @@ if DEFAULT_SETTINGS == True:
     throwerror(f'{settingspath.replace(f"/home/{user}", "~")} couldn\'t be generated, default settings will be used. Settings will not save.')
 
 # start of program, shown when opening the file
-print(f'version {c.cyan}{version}{c.r}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
-print(f'type {c.yellow}bhelp{c.r} for a list of custom commands')
+if not versiontext == '' and not versiontext == None:
+    vt = f' ({c.cyan}{versiontext}{c.r})'
+else:
+    vt = ''
+
+print(f'Version {c.cyan}{version}{c.r}{vt}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
+print(f'Type {c.yellow}bhelp{c.r} for a list of custom commands.')
 # main loop
 def main():
     while True:
@@ -922,7 +944,7 @@ def main():
 
         # display version info
         elif cmdargs[0] == ('version'):
-            print(f'breadshell version {c.cyan}{version}{c.r}')
+            print(f'breadshell version {c.cyan}{version}{c.r}{vt}')                
 
             # display version type
             if versiontype == 1:
@@ -930,11 +952,11 @@ def main():
             elif versiontype == 2:
                 print(f'this is a {c.yellow}prerelease{c.r} of breadshell. \nsome bugs may occur')
             elif versiontype == 3:
-                print(f'this is a {c.magenta}development build{c.r} of breadshell. \nsome bugs or unfinished features may occur')
+                print(f'this is a {c.magenta}development{c.r} version of breadshell. \nsome bugs or unfinished features may occur')
             elif versiontype == 4:
-                print(f'this is an {c.cyan}early development build{c.r} of breadshell. \nmany bugs or unfinished features may occur')
+                print(f'this is an {c.cyan}early development{c.r} version of breadshell. \nmany bugs or unfinished features may occur')
             else:
-                print(f'this is an {c.red}unknown{c.r} version of breadshell')
+                print(f'this is an {c.red}unknown {c.r}or {c.red}unofficial{c.r} version of breadshell')
 
             # display installation status
             if installed == True:
@@ -953,43 +975,131 @@ def main():
 
             print(f'source code on {c.blue}github.com/wheatbread2056/breadshell{c.r}')
 
+            if not devnote == """""" and not devnote == '' and not devnote == None:
+                print('Note from the developer:')
+                print(devnote)
+
         # edit settings --editsettings
         elif cmdargs[0] == ('settings'):
             if settings == {}:
                 throwerror(f'No settings were found, or there was an error reading settings.ini ({settingspath})')
                 main()
             else:
+                tm0 = 0
+                reflist = []
                 for key, value in settings.items():
                     if not key.startswith('h_') and not key.startswith('s_'):
-                        print(f"{key} - {c.cyan}{value}{c.r}")
+                        if key in friendlySettings:
+                            print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+                        else:
+                            print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                        reflist.append(key)
+                        tm0 += 1
 
-            print('Type the name of the setting you would like to change, or list to list settings, or exit to leave')
+            print('Type the number of the setting you would like to change, or list to list settings, or exit to leave')
 
             while True:
                 setting = input(f'{c.cyan}settings{c.r} {settings["pointerChar"]} ')
-                if setting in settings and not setting.startswith('h_') and not settings.startswith('s_'):
+                completed = False
+
+                # legacy (pre-1.0) settings, this means typing the non-friendly name of the setting and changing it that way still works
+                if setting in settings and not setting.startswith('h_') and not setting.startswith('s_'):
+                    throwerror('Note: Using non-friendly settings names is obsolete and may be removed in 1.1.')
                     print('Enter a new value:')
-                    newValue = input(f'{c.cyan}{setting}{c.r} {settings["pointerChar"]} ')
+                    newValue = input(f'{c.green}{setting}{c.r} {settings["pointerChar"]} ')
                     if newValue.lower() == 'true':
-                        add_settings(setting,True)
+                        try:
+                            add_settings(setting,True)
+                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
+                        except:
+                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
+
                     elif newValue.lower() == 'false':
-                        add_settings(setting,False)
+                        try:
+                            add_settings(setting,False)
+                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
+                        except:
+                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
+
+                    elif newValue.lower() == 'exit':
+                        pass
+
                     else:
-                        add_settings(setting,newValue)
-                elif setting.lower() == 'list':
-                    for key, value in settings.items():
-                        if not key.startswith('h_') and not key.startswith('s_'):
-                            print(f"{key} - {c.cyan}{value}{c.r}")
-                elif setting.lower() == 'dev-list':
-                    for key, value in settings.items():
-                        if not key.startswith('h_') and not key.startswith('s_'):
-                            print(f"{key} - {c.cyan}{value}{c.r}")
+                        try:
+                            add_settings(setting,newValue)
+                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
+                        except:
+                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
+                    completed = True
+
+                # new (1.0+) settings, number-based selection
+                try:
+                    if int(setting) < len(reflist):
+                        print('Enter a new value:')
+                        newValue = input(f'{c.green}{reflist[int(setting)]}{c.r} {settings["pointerChar"]} ')
+                        if newValue.lower() == 'true':
+                            try:
+                                add_settings(reflist[int(setting)],True)
+                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
+                            except:
+                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
+
+                        elif newValue.lower() == 'false':
+                            try:
+                                add_settings(reflist[int(setting)],False)
+                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
+                            except:
+                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
+
+                        elif newValue.lower() == 'exit':
+                            pass
+
                         else:
-                            print(f"{c.red}{key}{c.r} - {c.cyan}{value}{c.r}")
+                            try:
+                                add_settings(reflist[int(setting)],newValue)
+                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
+                            except:
+                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
+
+                        completed = True
+                except:
+                    pass
+
+                if setting.lower() == 'list':
+                    tm0 = 0
+                    reflist = []
+                    for key, value in settings.items():
+                        if not key.startswith('h_') and not key.startswith('s_'):
+                            if key in friendlySettings:
+                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+                            else:
+                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                            reflist.append(key)
+                            tm0 += 1
+
+                elif setting.lower() == 'dev-list':
+                    tm0 = 0
+                    reflist = []
+                    for key, value in settings.items():
+                        if not key.startswith('h_') and not key.startswith('s_'):
+                            if key in friendlySettings:
+                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r}")
+                            else:
+                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                            tm0 += 1
+                        else:
+                            if key in friendlySettings:
+                                print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r} {c.u}[HIDDEN]{c.r}")
+                            else:
+                                print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r} {c.u}[HIDDEN]{c.r}")
+
                 elif setting.lower() == 'exit':
                     break
+
+                elif completed == True: # variable added to stop throwing errors when nothing went wrong
+                    pass
+
                 else:
-      
                     throwerror('Invalid setting')
 
         # edit shortcuts (totally not just modified settings)
