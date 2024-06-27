@@ -1,6 +1,6 @@
 echo 'are you running install.sh in the directory containing breadshell.py? the installation will not work if you do not do this (Y/n)'
 read choice1
-if [ "$choice1" = 'Y' ]; then
+if [ "$choice1" = 'Y' ] || [ "$choice1" = 'y' ]; then
     echo proceeding with installation...
 else
     exit
