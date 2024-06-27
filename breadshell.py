@@ -80,7 +80,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev4b'
+version = '1.0-dev4c'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -999,9 +999,15 @@ def main():
                 for key, value in settings.items():
                     if not key.startswith('h_') and not key.startswith('s_'):
                         if key in friendlySettings:
-                            print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+                            if settings[key] == 'False':
+                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.red}{value}{c.r}")
+                            elif settings[key] == 'True':
+                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.green}{value}{c.r}")
+                            else:
+                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+
                         else:
-                            print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                            print(f"({c.yellow}{tm0}{c.r}) {c.yellow}{key}{c.r} - {c.cyan}{value}{c.r}") # if there is no friendly name for the setting
                         reflist.append(key)
                         tm0 += 1
 
@@ -1080,9 +1086,15 @@ def main():
                     for key, value in settings.items():
                         if not key.startswith('h_') and not key.startswith('s_'):
                             if key in friendlySettings:
-                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+                                if settings[key] == 'False':
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.red}{value}{c.r}")
+                                elif settings[key] == 'True':
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.green}{value}{c.r}")
+                                else:
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} - {c.cyan}{value}{c.r}")
+
                             else:
-                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                                print(f"({c.yellow}{tm0}{c.r}) {c.yellow}{key}{c.r} - {c.cyan}{value}{c.r}") # if there is no friendly name for the setting
                             reflist.append(key)
                             tm0 += 1
 
@@ -1092,15 +1104,25 @@ def main():
                     for key, value in settings.items():
                         if not key.startswith('h_') and not key.startswith('s_'):
                             if key in friendlySettings:
-                                print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r}")
+                                if settings[key] == 'False':
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.red}{value}{c.r} .b")
+                                elif settings[key] == 'True':
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.green}{value}{c.r} .b")
+                                else:
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r} .s")
                             else:
-                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r} .s")
                             tm0 += 1
                         else:
                             if key in friendlySettings:
-                                print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r} {c.u}[HIDDEN]{c.r}")
+                                if settings[key] == 'False':
+                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.red}{value}{c.r} {c.u}HIDDEN{c.e} .b")
+                                elif settings[key] == 'True':
+                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.green}{value}{c.r} {c.u}HIDDEN{c.e} .b")
+                                else:
+                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r} {c.u}HIDDEN{c.e} .s")
                             else:
-                                print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r} {c.u}[HIDDEN]{c.r}")
+                                print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r} {c.u}HIDDEN{c.e} .s")
 
                 elif setting.lower() == 'exit':
                     break
