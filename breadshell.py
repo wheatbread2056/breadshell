@@ -84,7 +84,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5-prev3'
+version = '1.0-dev5-prev4'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -816,6 +816,7 @@ print(f'version {c.cyan}{version}{c.r}{vt}, latest login {c.magenta}{datetime.da
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands.')
 # main loop
 def main():
+    global cmdhistory
     while True:
         # generate the line
 
@@ -892,7 +893,13 @@ def main():
                     print(key, end='')
             print()
             cmd = buffer
-            cmdhistory.append(cmd)
+            try: # make sure that empty and duplicate commands don't get added to the command history
+                if not cmd.replace(' ','') == '' and not cmd == cmdhistory[len(cmdhistory)-1]:
+                    cmdhistory.append(cmd)
+            except:
+                if not cmd.replace(' ','') == '':
+                    cmdhistory.append(cmd)
+
             historycur = -2
         
         print(c.r + c.e,end='') # attempt to stop command output from using the set text color
@@ -996,6 +1003,12 @@ def main():
 {c.i}this should be italic{c.e}
 {c.u}this should be underlined{c.e}
 ''')
+
+        elif cmdargs[0] == ('dev-clear-history'):
+            try:
+                cmdhistory = []
+            except Exception as e:
+                throwerror(f'Failed to clear command history ({e})')
 
         # launch games
         elif cmdargs[0] == ('bgames'):
