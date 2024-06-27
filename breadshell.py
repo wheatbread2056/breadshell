@@ -93,7 +93,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5-prev1'
+version = '1.0-dev5-prev2'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -864,17 +864,29 @@ def main():
                 key = getkey()
                 if key == keys.ENTER:
                     break
-                elif key == keys.UP:
+                elif key == keys.UP: # previous command in the history
                     try:
                         # if historycur = -1, that's the end of the history
                         prevbuffer = buffer
                         if historycur == -2:
-                            historycur = len(cmdhistory)-1
-                        if historycur > -1:
+                            historycur = len(cmdhistory)
+                        if historycur > 0:
+                            historycur -= 1
                             buffer = cmdhistory[historycur]
                             print('\b \b' * len(prevbuffer), end='')
                             print(buffer,end='')
-                            historycur -= 1
+                    except:
+                        pass
+                elif key == keys.DOWN: # next command in the history
+                    try:
+                        prevbuffer = buffer
+                        if historycur == -2:
+                            historycur = len(cmdhistory)-1
+                        if historycur < len(cmdhistory)-1:
+                            historycur += 1
+                            buffer = cmdhistory[historycur]
+                            print('\b \b' * len(prevbuffer), end='')
+                            print(buffer,end='')
                     except:
                         pass
                 else:
