@@ -35,6 +35,8 @@ import re
 
 DISABLE_COLORS = False
 DEFAULT_SETTINGS = False
+LEGACY_PROMPT = False # just uses prompt() which was used in every version before 1.0
+
 # import colorama
 try:
     import colorama
@@ -76,11 +78,22 @@ except:
     except:
         failed_imports.append('prompt_toolkit')
 
+# import prompt_tooklit - used for autocompletion
+try:
+    from getkey import getkey, keys
+except:
+    try:
+        os.system('pip install getkey --break-system-packages')
+        from getkey import getkey, keys
+    except:
+        failed_imports.append('getkey')
+
+
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev4c'
+version = '1.0-dev5-prev1'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -805,6 +818,9 @@ if not versiontext == '' and not versiontext == None:
 else:
     vt = ''
 
+cmdhistory = []
+historycur = -2
+
 print(f'version {c.cyan}{version}{c.r}{vt}, latest login {c.magenta}{datetime.datetime.now()}{c.r}')
 print(f'type {c.yellow}bhelp{c.r} for a list of custom commands.')
 # main loop
@@ -836,10 +852,38 @@ def main():
         tempcmd += cc.text
 
         # main input (user@hostname path/to/directory > command typed in) --main
-        try:
-            cmd = input(tempcmd)
-        except Exception as e:
-            fatalerror('An error has occured: '+str(e))
+        if LEGACY_PROMPT == True: # pre 1.0, only used as fallback
+            try:
+                cmd = input(tempcmd)
+            except Exception as e:
+                fatalerror('An error has occured: '+str(e))
+        else:
+            buffer = ''
+            print(tempcmd, end='')
+            while True:
+                key = getkey()
+                if key == keys.ENTER:
+                    break
+                elif key == keys.UP:
+                    try:
+                        # if historycur = -1, that's the end of the history
+                        prevbuffer = buffer
+                        if historycur == -2:
+                            historycur = len(cmdhistory)-1
+                        if historycur > -1:
+                            buffer = cmdhistory[historycur]
+                            print('\b \b' * len(prevbuffer), end='')
+                            print(buffer,end='')
+                            historycur -= 1
+                    except:
+                        pass
+                else:
+                    buffer += str(key)
+                    print(key, end='')
+            print()
+            cmd = buffer
+            cmdhistory.append(cmd)
+            historycur = -2
         
         print(c.r + c.e,end='') # attempt to stop command output from using the set text color
         cmdargs = cmd.split(' ') # get command arguments
