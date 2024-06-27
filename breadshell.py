@@ -68,17 +68,7 @@ except:
     except:
         failed_imports.append('distro')
 
-# import prompt_tooklit - used for autocompletion
-try:
-    import prompt_tooklit
-except:
-    try:
-        os.system('pip install prompt_toolkit --break-system-packages')
-        import prompt_toolkit
-    except:
-        failed_imports.append('prompt_toolkit')
-
-# import prompt_tooklit - used for autocompletion
+# import getkey - required for autocompletion + command history
 try:
     from getkey import getkey, keys
 except:
@@ -87,13 +77,14 @@ except:
         from getkey import getkey, keys
     except:
         failed_imports.append('getkey')
+        LEGACY_PROMPT = True
 
 
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5-prev2'
+version = '1.0-dev5-prev3'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -887,6 +878,13 @@ def main():
                             buffer = cmdhistory[historycur]
                             print('\b \b' * len(prevbuffer), end='')
                             print(buffer,end='')
+                    except:
+                        pass
+                elif key == keys.BACKSPACE: # handle backspace
+                    try:
+                        if len(buffer) > 0:
+                            buffer = buffer[:len(buffer)-1]
+                            print('\b \b', end='')
                     except:
                         pass
                 else:
