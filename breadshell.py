@@ -1,5 +1,3 @@
-# breadshell development build
-
 # detect if running on wsl
 try:
     with open('/proc/version', 'r') as f:
@@ -84,7 +82,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5-prev5'
+version = '1.0-dev5'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -858,8 +856,10 @@ def main():
             print(tempcmd, end='')
             while True:
                 key = getkey()
+                
                 if key == keys.ENTER:
                     break
+
                 elif key == keys.UP: # previous command in the history
                     try:
                         # if historycur = -1, that's the end of the history
@@ -873,6 +873,7 @@ def main():
                             print(buffer,end='')
                     except:
                         pass
+                    
                 elif key == keys.DOWN: # next command in the history
                     try:
                         prevbuffer = buffer
@@ -885,6 +886,7 @@ def main():
                             print(buffer,end='')
                     except:
                         pass
+
                 elif key == keys.BACKSPACE: # handle backspace
                     try:
                         if len(buffer) > 0:
@@ -895,19 +897,27 @@ def main():
                 else:
                     buffer += str(key)
                     print(key, end='')
-            print()
-            cmd = buffer
+
+            print() # newline
+            tcmd = buffer
+            tcmdargs = tcmd.split(' ')
+            cmdargs = [x for x in tcmdargs if x != '']
+            cmd = ' '.join(cmdargs)
+
+            print(cmdargs)
             try: # make sure that empty and duplicate commands don't get added to the command history
                 if not cmd.replace(' ','') == '' and not cmd == cmdhistory[len(cmdhistory)-1]:
-                    cmdhistory.append(cmd)
+                    cmdhistory.append(' '.join(cmdargs))
             except:
                 if not cmd.replace(' ','') == '':
                     cmdhistory.append(cmd)
 
+            if cmdargs == []:
+                cmdargs.append('')
+
             historycur = -2
         
         print(c.r + c.e,end='') # attempt to stop command output from using the set text color
-        cmdargs = cmd.split(' ') # get command arguments
 
         # for special commands
             
