@@ -84,7 +84,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5-prev4'
+version = '1.0-dev5-prev5'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -102,6 +102,10 @@ if DISABLE_COLORS == True:
         white = ''
         black = ''
         r = ''
+        b = ''
+        i = ''
+        e = ''
+        u = ''
 
     class bc:
         red = ''
