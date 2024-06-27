@@ -904,7 +904,6 @@ def main():
             cmdargs = [x for x in tcmdargs if x != '']
             cmd = ' '.join(cmdargs)
 
-            print(cmdargs)
             try: # make sure that empty and duplicate commands don't get added to the command history
                 if not cmd.replace(' ','') == '' and not cmd == cmdhistory[len(cmdhistory)-1]:
                     cmdhistory.append(' '.join(cmdargs))
