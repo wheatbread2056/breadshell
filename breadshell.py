@@ -10,11 +10,16 @@ try:
 except:
     WSL = False
 
+failed_imports = []
+
 # IMPORT ALL DEPENDENCIES --initial
 
 # built-in libraries
 import os
-import curses
+try:
+    import curses
+except:
+    failed_imports.append('curses')
 import time
 import sys
 import threading
@@ -35,57 +40,50 @@ try:
     import colorama
 except:
     try:
-        print('colorama not installed, installing now')
         os.system('pip install colorama --break-system-packages')
         import colorama
     except:
-        print('FAILED TO INSTALL, DISABLING COLORS')
         DISABLE_COLORS = True
+        failed_imports.append('colorama')
 
 # import playsound (for beeper utility)
 try:
     from playsound import playsound
 except:
     try:
-        print('playsound not installed, installing now')
         os.system('pip install playsound --break-system-packages')
         from playsound import playsound
     except:
-        print('FAILED TO INSTALL, ANYTHING DEPENDENT ON THE PLAYSOUND MODULE WILL NOT WORK')
+        failed_imports.append('playsound')
 
 # import distro (issue #1 https://github.com/wheatbread2056/breadshell/issues/1)
 try:
     import distro
 except:
     try:
-        print('distro not installed, installing now')
         os.system('pip install playsound --break-system-packages')
         import distro
     except:
-        print('FAILED TO INSTALL, DEFAULTING TO APT AS PACKAGE MANAGER')
+        failed_imports.append('distro')
 
 # import prompt_tooklit - used for autocompletion
 try:
     import prompt_tooklit
 except:
     try:
-        print('prompt_toolkit not installed, installing now')
         os.system('pip install prompt_toolkit --break-system-packages')
         import prompt_toolkit
     except:
-        print('FAILED TO INSTALL, THERE WILL BE NO AUTOCOMPLETION')
+        failed_imports.append('prompt_toolkit')
 
 # makes sure that bash shell is used
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev4a'
+version = '1.0-dev4b'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
-
-# clear the console
-os.system('clear')
 
 # define colors --customization
 if DISABLE_COLORS == True:
@@ -148,7 +146,8 @@ class cc:
     text = c.r
     pointer = c.r
 
-colorama.init(autoreset=True) # fix weird command output color bug idk
+if not 'colorama' in failed_imports:
+    colorama.init(autoreset=True) # fix weird command output color bug idk
 
 # used for networktest utility
 def ping_ip(ip_address):
@@ -238,12 +237,16 @@ defaultSettings = {
     'showDir': 'True',
     'showPointer': 'True',
     'showHost': 'True',
+    'clearOnBoot': 'True',
+    'shortenDir': 'True',
     'dirType': '0',
 }
+temp1494861 = 0
+# checks for settings (kinda sucks but it works)
 if DEFAULT_SETTINGS == False:
     for setting in defaultSettings:
         try:
-            print(settings[setting])
+            temp1494861 = settings[setting]
         except:
             add_settings(setting,defaultSettings[setting])
 else:
@@ -260,12 +263,15 @@ friendlySettings = {
     'showDir': 'Show Current Directory',
     'showPointer': 'Show Pointer',
     'showHost': 'Show Hostname',
+    'clearOnBoot': 'Clear On Boot',
+    'shortenDir': 'Shorten User Directory',
     'dirType': 'not implemented', # add this later
     'h_version': 'Installed Version',
 }
 
-# clear console (2nd time)
-os.system('clear')
+# clear console
+if settings['clearOnBoot'] == 'True':
+    os.system('clear')
 
 # change colors depending on settings
 exec(f"cc.login = c.{settings['loginColor']}")
@@ -819,7 +825,10 @@ def main():
                     tempcmd = tempcmd.split('@')[0]+f'{c.r} '
 
         if settings['showDir'] == 'True':
-            tempcmd += f"{cc.dir}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
+            if settings['shortenDir'] == 'True':
+                tempcmd += f"{cc.dir}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
+            else:
+                tempcmd += f"{cc.dir}{os.getcwd()}{c.r} "
 
         if settings['showPointer'] == 'True':
             tempcmd += f"{cc.pointer}{settings['pointerChar']} {c.r}"
