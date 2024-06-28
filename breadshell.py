@@ -82,7 +82,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5'
+version = '1.0-dev5a'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -144,13 +144,6 @@ else:
         white = colorama.Back.WHITE
         black = colorama.Back.BLACK
         r = colorama.Back.RESET # resets color to default
-
-# color customization
-class cc:
-    login = c.blue
-    dir = c.green
-    text = c.r
-    pointer = c.r
 
 if not 'colorama' in failed_imports:
     colorama.init(autoreset=True) # fix weird command output color bug idk
@@ -214,7 +207,10 @@ if DEFAULT_SETTINGS == False:
 
 # overwrite the settings and add new values
 def add_settings(key, value):
-    settings[key] = value
+    if value == True or value == False:
+        settings[key] = str(value)
+    else:
+        settings[key] = value
     # write to the file
     if DEFAULT_SETTINGS == False:
         with open(settingspath, 'w') as file:
@@ -275,15 +271,41 @@ friendlySettings = {
     'h_version': 'Installed Version',
 }
 
+# settings types and their valid options
+# any setting with a type not defined will just be 'any'
+types = {
+    'color': ['default', 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta', 'white', 'black'],
+    'texteffect': ['none', 'bold', 'italic', 'underline'],
+    'bool': ['true', 'false', 't', 'f'],
+    'str': 'any',
+    'num': 'any',
+}
+
+settingtypes = {
+    'loginColor': 'color',
+    'dirColor': 'color',
+    'textColor': 'color',
+    'pointerColor': 'color',
+    'pointerChar': 'str',
+    'showLogin': 'bool',
+    'showDir': 'bool',
+    'showPointer': 'bool',
+    'showHost': 'bool',
+    'clearOnBoot': 'bool',
+    'shortenDir': 'bool',
+    'dirType': 'num', # add this later
+}
+
+boolTranslation = {
+    'true': True,
+    'false': False,
+    't': True,
+    'f': False
+}
+
 # clear console
 if settings['clearOnBoot'] == 'True':
     os.system('clear')
-
-# change colors depending on settings
-exec(f"cc.login = c.{settings['loginColor']}")
-exec(f"cc.dir = c.{settings['dirColor']}")
-exec(f"cc.text = c.{settings['textColor']}")
-exec(f"cc.pointer = c.{settings['pointerColor']}")
 
 # check if breadshell is installed --installcheck
 try:
@@ -811,6 +833,10 @@ if not versiontext == '' and not versiontext == None:
 else:
     vt = ''
 
+def color(col):
+    global c
+    return c.__getattribute__(c, col)
+
 cmdhistory = []
 historycur = -2
 
@@ -825,25 +851,25 @@ def main():
         tempcmd = ""
         if settings['showLogin'] == 'True':
             try:
-                tempcmd += f"{cc.login}{user}@{socket.gethostname()}{c.r} "
+                tempcmd += f"{color(settings['loginColor'])}{user}@{socket.gethostname()}{c.r} "
                 if not settings['showHost'] == 'True':
                     tempcmd = tempcmd.split('@')[0]+f'{c.r} '
             except Exception as e:
                 reportBadStart(e)
-                tempcmd += f"{cc.login}user@{socket.gethostname()}{c.r} "
+                tempcmd += f"{color(settings['loginColor'])}user@{socket.gethostname()}{c.r} "
                 if not settings['showHost'] == 'True':
                     tempcmd = tempcmd.split('@')[0]+f'{c.r} '
 
         if settings['showDir'] == 'True':
             if settings['shortenDir'] == 'True':
-                tempcmd += f"{cc.dir}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
+                tempcmd += f"{color(settings['dirColor'])}{os.getcwd()}{c.r} ".replace(f'/home/{user}', '~')
             else:
-                tempcmd += f"{cc.dir}{os.getcwd()}{c.r} "
+                tempcmd += f"{color(settings['dirColor'])}{os.getcwd()}{c.r} "
 
         if settings['showPointer'] == 'True':
-            tempcmd += f"{cc.pointer}{settings['pointerChar']} {c.r}"
+            tempcmd += f"{color(settings['pointerColor'])}{settings['pointerChar']} {c.r}"
 
-        tempcmd += cc.text
+        tempcmd += color(settings['textColor'])
 
         # main input (user@hostname path/to/directory > command typed in) --main
         if LEGACY_PROMPT == True: # pre 1.0, only used as fallback
@@ -1097,64 +1123,53 @@ def main():
                 setting = input(f'{c.cyan}settings{c.r} {settings["pointerChar"]} ')
                 completed = False
 
-                # legacy (pre-1.0) settings, this means typing the non-friendly name of the setting and changing it that way still works
-                if setting in settings and not setting.startswith('h_') and not setting.startswith('s_'):
-                    throwerror('Note: Using non-friendly settings names is obsolete and may be removed in 1.1.')
-                    print('Enter a new value:')
-                    newValue = input(f'{c.green}{setting}{c.r} {settings["pointerChar"]} ')
-                    if newValue.lower() == 'true':
-                        try:
-                            add_settings(setting,True)
-                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
-                        except:
-                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
-
-                    elif newValue.lower() == 'false':
-                        try:
-                            add_settings(setting,False)
-                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
-                        except:
-                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
-
-                    elif newValue.lower() == 'exit':
-                        pass
-
-                    else:
-                        try:
-                            add_settings(setting,newValue)
-                            print(f'Successfully updated the setting {c.green}{setting}{c.r}.')
-                        except:
-                            throwerror(f'Failed to update the setting {c.green}{setting}{c.r}')
-                    completed = True
-
                 # new (1.0+) settings, number-based selection
+                # legacy settings removed because i am NOT updating the code 2 times in a row
                 try:
-                    if int(setting) < len(reflist):
+                    if int(setting) < len(reflist) and int(setting) > -1:
                         print('Enter a new value:')
-                        newValue = input(f'{c.green}{reflist[int(setting)]}{c.r} {settings["pointerChar"]} ')
-                        if newValue.lower() == 'true':
-                            try:
-                                add_settings(reflist[int(setting)],True)
-                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
-                            except:
-                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
-
-                        elif newValue.lower() == 'false':
-                            try:
-                                add_settings(reflist[int(setting)],False)
-                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
-                            except:
-                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
+                        newValue = input(f'{c.green}{friendlySettings[reflist[int(setting)]]}{c.r} {settings["pointerChar"]} ')
+                        if settingtypes[reflist[int(setting)]] == 'bool':
+                            if newValue.lower() in boolTranslation:
+                                try:
+                                    add_settings(reflist[int(setting)],boolTranslation[newValue.lower()])
+                                    print(settings[reflist[int(setting)]])
+                                    print(f'Successfully updated the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}.')
+                                except:
+                                    throwerror(f'Failed to update the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}')
+                            else:
+                                throwerror(f'Invalid value, type \'{settingtypes[reflist[int(setting)]]}\' only allows values {types["bool"]}')
 
                         elif newValue.lower() == 'exit':
                             pass
 
                         else:
-                            try:
-                                add_settings(reflist[int(setting)],newValue)
-                                print(f'Successfully updated the setting {c.green}{reflist[int(setting)]}{c.r}.')
-                            except:
-                                throwerror(f'Failed to update the setting {c.green}{reflist[int(setting)]}{c.r}')
+                            if newValue.lower() in types[settingtypes[reflist[int(setting)]]]:
+                                try:
+                                    if settingtypes[reflist[int(setting)]] == 'color':
+                                        if newValue.lower() == 'default':
+                                            add_settings(reflist[int(setting)],'r')
+                                        else:
+                                            add_settings(reflist[int(setting)], newValue.lower())
+
+                                    elif settingtypes[reflist[int(setting)]] == 'texteffect':
+                                        if newValue.lower() == 'none':
+                                            add_settings(reflist[int(setting)],'e')
+                                        elif newValue.lower() == 'bold':
+                                            add_settings(reflist[int(setting)],'b')
+                                        elif newValue.lower() == 'italic':
+                                            add_settings(reflist[int(setting)],'i')
+                                        elif newValue.lower() == 'underline':
+                                            add_settings(reflist[int(setting)],'u')
+                                            
+                                    else:
+                                        add_settings(reflist[int(setting)], newValue)
+
+                                    print(f'Successfully updated the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}.')
+                                except:
+                                    throwerror(f'Failed to update the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}')
+                            else:
+                                throwerror(f'Invalid value, type \'{settingtypes[reflist[int(setting)]]}\' only allows values {types[settingtypes[reflist[int(setting)]]]}')
 
                         completed = True
                 except:
@@ -1184,25 +1199,38 @@ def main():
                     for key, value in settings.items():
                         if not key.startswith('h_') and not key.startswith('s_'):
                             if key in friendlySettings:
-                                if settings[key] == 'False':
-                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.red}{value}{c.r} .b")
-                                elif settings[key] == 'True':
-                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.green}{value}{c.r} .b")
+                                if key in settingtypes:
+                                    if settings[key] == 'False' and settingtypes[key] == 'bool':
+                                        print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.red}{value}{c.r} [{c.yellow}bool{c.r}]")
+                                    elif settings[key] == 'True' and settingtypes[key] == 'bool':
+                                        print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.green}{value}{c.r} [{c.yellow}bool{c.r}]")
+                                    else:
+                                        print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r} [{c.yellow}{settingtypes[key]}{c.r}]")
                                 else:
-                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r} .s")
+                                    print(f"({c.yellow}{tm0}{c.r}) {friendlySettings[key]} [{key}] - {c.cyan}{value}{c.r}")
                             else:
-                                print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r} .s")
+                                if key in settingtypes:
+                                    print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r} [{c.yellow}{settingtypes[key]}{c.r}]")
+                                else:
+                                    print(f"({c.yellow}{tm0}{c.r}) {key} - {c.cyan}{value}{c.r}")
+                            reflist.append(key)
                             tm0 += 1
                         else:
                             if key in friendlySettings:
-                                if settings[key] == 'False':
-                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.red}{value}{c.r} {c.u}HIDDEN{c.e} .b")
-                                elif settings[key] == 'True':
-                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.green}{value}{c.r} {c.u}HIDDEN{c.e} .b")
+                                if key in settingtypes:
+                                    if settings[key] == 'False' and settingtypes[key] == 'bool':
+                                        print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.red}{value}{c.r} [{c.yellow}bool{c.r}]")
+                                    elif settings[key] == 'True' and settingtypes[key] == 'bool':
+                                        print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.green}{value}{c.r} [{c.yellow}bool{c.r}]")
+                                    else:
+                                        print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r} [{c.yellow}{settingtypes[key]}{c.r}]")
                                 else:
-                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r} {c.u}HIDDEN{c.e} .s")
+                                    print(f"({c.red}X{c.r}) {friendlySettings[key]} [{c.red}{key}{c.r}] - {c.cyan}{value}{c.r}")
                             else:
-                                print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r} {c.u}HIDDEN{c.e} .s")
+                                if key in settingtypes:
+                                    print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r} [{c.yellow}{settingtypes[key]}{c.r}]")
+                                else:
+                                    print(f"({c.red}X{c.r}) {c.red}{key}{c.r} - {c.cyan}{value}{c.r}")
 
                 elif setting.lower() == 'exit':
                     break
