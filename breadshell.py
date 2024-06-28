@@ -82,7 +82,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5b'
+version = '1.0-dev5c'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -1137,7 +1137,6 @@ def main():
                             if newValue.lower() in boolTranslation:
                                 try:
                                     add_settings(reflist[int(setting)],boolTranslation[newValue.lower()])
-                                    print(settings[reflist[int(setting)]])
                                     print(f'Successfully updated the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}.')
                                 except:
                                     throwerror(f'Failed to update the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}')
@@ -1148,32 +1147,40 @@ def main():
                             pass
 
                         else:
-                            if newValue.lower() in types[settingtypes[reflist[int(setting)]]]:
-                                try:
-                                    if settingtypes[reflist[int(setting)]] == 'color':
-                                        if newValue.lower() == 'default':
-                                            add_settings(reflist[int(setting)],'r')
+                            if not types[settingtypes[reflist[int(setting)]]] == 'any' and not types[settingtypes[reflist[int(setting)]]] == None:
+                                if newValue.lower() in types[settingtypes[reflist[int(setting)]]]:
+                                    try:
+                                        if settingtypes[reflist[int(setting)]] == 'color':
+                                            if newValue.lower() == 'default':
+                                                add_settings(reflist[int(setting)],'r')
+                                            else:
+                                                add_settings(reflist[int(setting)], newValue.lower())
+
+                                        elif settingtypes[reflist[int(setting)]] == 'texteffect':
+                                            if newValue.lower() == 'none':
+                                                add_settings(reflist[int(setting)],'e')
+                                            elif newValue.lower() == 'bold':
+                                                add_settings(reflist[int(setting)],'b')
+                                            elif newValue.lower() == 'italic':
+                                                add_settings(reflist[int(setting)],'i')
+                                            elif newValue.lower() == 'underline':
+                                                add_settings(reflist[int(setting)],'u')
+                                                
                                         else:
-                                            add_settings(reflist[int(setting)], newValue.lower())
+                                            add_settings(reflist[int(setting)], newValue)
 
-                                    elif settingtypes[reflist[int(setting)]] == 'texteffect':
-                                        if newValue.lower() == 'none':
-                                            add_settings(reflist[int(setting)],'e')
-                                        elif newValue.lower() == 'bold':
-                                            add_settings(reflist[int(setting)],'b')
-                                        elif newValue.lower() == 'italic':
-                                            add_settings(reflist[int(setting)],'i')
-                                        elif newValue.lower() == 'underline':
-                                            add_settings(reflist[int(setting)],'u')
-                                            
-                                    else:
-                                        add_settings(reflist[int(setting)], newValue)
-
+                                        print(f'Successfully updated the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}.')
+                                    except:
+                                        throwerror(f'Failed to update the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}')
+                                else:
+                                    throwerror(f'Invalid value, type \'{settingtypes[reflist[int(setting)]]}\' only allows values {types[settingtypes[reflist[int(setting)]]]}')
+                            else:
+                                try:
+                                    add_settings(reflist[int(setting)], newValue)
                                     print(f'Successfully updated the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}.')
                                 except:
                                     throwerror(f'Failed to update the setting {c.green}{friendlySettings[reflist[int(setting)]]}{c.r}')
-                            else:
-                                throwerror(f'Invalid value, type \'{settingtypes[reflist[int(setting)]]}\' only allows values {types[settingtypes[reflist[int(setting)]]]}')
+
 
                         completed = True
                 except:
