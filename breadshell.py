@@ -82,7 +82,7 @@ except:
 os.environ['SHELL'] = '/bin/bash'
 
 # version number and other information --version
-version = '1.0-dev5a'
+version = '1.0-dev5b'
 versiontype = 3 # 1 = release, 2 = prerelease, 3 = development, 4 = early development
 versiontext = '' # add for stuff like "bugtesting preview" or "private beta", appended to version in parentheses. example: 1.1-pre7c (Private Beta)
 devnote = ''
@@ -827,6 +827,9 @@ if WSL == 1:
 if DEFAULT_SETTINGS == True:
     throwerror(f'{settingspath.replace(f"/home/{user}", "~")} couldn\'t be generated, default settings will be used. Settings will not save.')
 
+if LEGACY_PROMPT == True:
+    throwerror('Legacy fallback prompt is enabled. Command history will not work and functionality will be limited.')
+
 # start of program, shown when opening the file
 if not versiontext == '' and not versiontext == None:
     vt = f' ({c.cyan}{versiontext}{c.r})'
@@ -875,6 +878,7 @@ def main():
         if LEGACY_PROMPT == True: # pre 1.0, only used as fallback
             try:
                 cmd = input(tempcmd)
+                cmdargs = cmd.split(' ')
             except Exception as e:
                 fatalerror('An error has occured: '+str(e))
         else:
