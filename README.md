@@ -1,4 +1,4 @@
-shell for linux
+command line thingamajig for linux
 
 to install:
 `cd path/to/breadshell` (replacing path/to with the actual path to the folder, usually `Downloads/breadshell`)
