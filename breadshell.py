@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # detect if running on wsl
 try:
     with open('/proc/version', 'r') as f:
@@ -15,7 +17,7 @@ failed_imports = []
 # built-in libraries
 import os
 try:
-    import curses
+    import curses # in rare cases curses might not be installed in the user's python installation
 except:
     failed_imports.append('curses')
 import time
@@ -1128,7 +1130,7 @@ def main():
                 completed = False
 
                 # new (1.0+) settings, number-based selection
-                # legacy settings removed because i am NOT updating the code 2 times in a row
+                # legacy settings removed because i am NOT updating the code twice whenever i need to change this
                 try:
                     if int(setting) < len(reflist) and int(setting) > -1:
                         print('Enter a new value:')
